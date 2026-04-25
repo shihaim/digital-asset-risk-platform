@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: digital-asset-risk-platform
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/fds
+    username: fds
+    password: fds1234!
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: risk-platform
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        spring.json.trusted.packages: "com.example.riskplatform.*"
+    listener:
+      ack-mode: manual
+    producer:
+      acks: all
+      retries: 3
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
