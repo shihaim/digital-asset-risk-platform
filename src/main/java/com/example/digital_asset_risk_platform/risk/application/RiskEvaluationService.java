@@ -25,7 +25,7 @@ public class RiskEvaluationService {
 
     private final RiskContextBuilder riskContextBuilder;
     private final List<RiskRule> rules;
-    private final DecisionEngine decisionEngine;
+    private final DecisionEngine decisionEngine = new DecisionEngine();
     private final RiskEvaluationRepository riskEvaluationRepository;
     private final RiskRuleHitRepository riskRuleHitRepository;
 

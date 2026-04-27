@@ -49,8 +49,8 @@ public class WithdrawalService {
     }
 
     private void applyDecision(WithdrawalRequest withdrawal, RiskDecisionType decision) {
-        if (decision == RiskDecisionType.ALLOW || decision == RiskDecisionType.HOLD_WITHDRAWAL) {
-            withdrawal.hold();
+        if (decision == RiskDecisionType.ALLOW || decision == RiskDecisionType.MONITOR) {
+            withdrawal.approve();
             return;
         }
 
