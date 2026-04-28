@@ -8,13 +8,13 @@ import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalCreateRequest;
 import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalCreateResponse;
 import com.example.digital_asset_risk_platform.wallet.repository.WithdrawalRequestRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class WithdrawalService {
 
     private final WithdrawalRequestRepository withdrawalRequestRepository;

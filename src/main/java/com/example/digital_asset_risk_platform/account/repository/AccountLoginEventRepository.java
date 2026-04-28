@@ -9,6 +9,8 @@ import java.util.List;
 public interface AccountLoginEventRepository extends JpaRepository<AccountLoginEvent, Long> {
     List<AccountLoginEvent> findByUserIdAndLoginAtAfter(Long userId, LocalDateTime loginAt);
 
+    List<AccountLoginEvent> findByUserIdAndLoginAtAfterOrderByLoginAtDesc(Long userId, LocalDateTime loginAt);
+
     boolean existsByUserIdAndDeviceId(Long userId, String deviceId);
 
 }

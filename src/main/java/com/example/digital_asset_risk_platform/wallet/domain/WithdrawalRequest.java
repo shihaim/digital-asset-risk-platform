@@ -94,4 +94,10 @@ public class WithdrawalRequest {
         this.rejectedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void reject() {
+        this.status = WithdrawalStatus.REJECTED;
+        this.rejectedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

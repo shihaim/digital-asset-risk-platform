@@ -6,13 +6,13 @@ import com.example.digital_asset_risk_platform.risk.domain.RiskDecisionType;
 import com.example.digital_asset_risk_platform.risk.domain.RiskLevel;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class RiskCaseService {
 
     private final RiskCaseRepository riskCaseRepository;

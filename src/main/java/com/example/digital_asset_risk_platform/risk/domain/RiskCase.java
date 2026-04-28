@@ -41,8 +41,17 @@ public class RiskCase {
     @Column(name = "risk_level", nullable = false, length = 30)
     private RiskLevel riskLevel;
 
+    @Column(name = "assigned_to", length = 100)
+    private String assignedTo;
+
+    @Column(name = "review_result", length = 50)
+    private String reviewResult;
+
     @Column(name = "review_comment", length = 2000)
     private String reviewComment;
+
+    @Column(name = "closed_at", length = 2000)
+    private LocalDateTime closedAt;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -62,6 +71,54 @@ public class RiskCase {
         this.riskLevel = riskLevel;
         this.status = RiskCaseStatus.REVIEW_REQUIRED;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+
+    ///========================================///
+    public void startReview(String reviewer) {
+        if (this.status != RiskCaseStatus.REVIEW_REQUIRED) {
+            throw new IllegalStateException("심사를 시작할 수 없는 Case 상태입니다: " + this.status);
+        }
+
+        this.status = RiskCaseStatus.IN_REVIEW;
+        this.assignedTo = reviewer;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void approve(String reviewer, String comment) {
+        this.status = RiskCaseStatus.APPROVED;
+        this.assignedTo = reviewer;
+        this.reviewResult = "APPROVED";
+        this.reviewComment = comment;
+        this.closedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void reject(String reviewer, String comment) {
+        this.status = RiskCaseStatus.REJECTED;
+        this.assignedTo = reviewer;
+        this.reviewResult = "REJECTED";
+        this.reviewComment = comment;
+        this.closedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void markFalsePositive(String reviewer, String comment) {
+        this.status = RiskCaseStatus.FALSE_POSITIVE;
+        this.assignedTo = reviewer;
+        this.reviewResult = "FALSE_POSITIVE";
+        this.reviewComment = comment;
+        this.closedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void markTruePositive(String reviewer, String comment) {
+        this.status = RiskCaseStatus.TRUE_POSITIVE;
+        this.assignedTo = reviewer;
+        this.reviewResult = "TRUE_POSITIVE";
+        this.reviewComment = comment;
+        this.closedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 }

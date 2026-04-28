@@ -6,13 +6,13 @@ import com.example.digital_asset_risk_platform.account.dto.LoginEventCreateReque
 import com.example.digital_asset_risk_platform.account.dto.SecurityEventCreateRequest;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class AccountEventService {
 
     private final AccountLoginEventRepository loginEventRepository;

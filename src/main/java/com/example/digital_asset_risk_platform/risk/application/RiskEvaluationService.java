@@ -11,16 +11,16 @@ import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitReposi
 import com.example.digital_asset_risk_platform.risk.rule.RiskRule;
 import com.example.digital_asset_risk_platform.risk.rule.RuleHit;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class RiskEvaluationService {
 
     private final RiskContextBuilder riskContextBuilder;

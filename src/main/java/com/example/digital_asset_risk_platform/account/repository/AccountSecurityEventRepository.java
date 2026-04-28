@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AccountSecurityEventRepository extends JpaRepository<AccountSecurityEvent, Long> {
-
     List<AccountSecurityEvent> findByUserIdAndEventAtAfter(Long userId, LocalDateTime eventAt);
+
+    List<AccountSecurityEvent> findByUserIdAndEventAtAfterOrderByEventAtDesc(Long userId, LocalDateTime eventAt);
 
     boolean existsByUserIdAndEventTypeAndEventAtAfter(Long userId, SecurityEventType eventType, LocalDateTime eventAt);
 }
