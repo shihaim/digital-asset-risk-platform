@@ -7,6 +7,7 @@ import com.example.digital_asset_risk_platform.account.dto.LoginEventCreateReque
 import com.example.digital_asset_risk_platform.account.dto.SecurityEventCreateRequest;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
+import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseType;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -69,6 +71,9 @@ class WithdrawalServiceIntegrationTest extends IntegrationTestSupport {
 
     @Autowired
     RiskCaseRepository riskCaseRepository;
+
+    @MockitoBean
+    DomainEventPublisher domainEventPublisher;
 
     @BeforeEach
     void setUp() {

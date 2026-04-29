@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.risk.application;
 
+import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
+import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.context.RiskContext;
 import com.example.digital_asset_risk_platform.risk.context.RiskContextBuilder;
 import com.example.digital_asset_risk_platform.risk.decision.DecisionEngine;
@@ -15,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -28,6 +32,7 @@ public class RiskEvaluationService {
     private final DecisionEngine decisionEngine = new DecisionEngine();
     private final RiskEvaluationRepository riskEvaluationRepository;
     private final RiskRuleHitRepository riskRuleHitRepository;
+    private final DomainEventPublisher domainEventPublisher;
 
     public RiskEvaluationResult evaluationWithdrawal(WithdrawalRequest withdrawal) {
         RiskContext context = riskContextBuilder.build(withdrawal);
@@ -62,6 +67,20 @@ public class RiskEvaluationService {
                 .toList();
 
         riskRuleHitRepository.saveAll(ruleHitEntities);
+
+        domainEventPublisher.publish(new RiskEvaluationCompletedEvent(
+                UUID.randomUUID().toString(),
+                savedEvaluation.getId(),
+                "WITHDRAWAL",
+                withdrawal.getId(),
+                withdrawal.getUserId(),
+                decision.totalScore(),
+                decision.riskLevel().name(),
+                decision.decisionType().name(),
+                hits.stream().map(RuleHit::ruleCode).toList(),
+                savedEvaluation.getEvaluatedAt(),
+                LocalDateTime.now()
+        ));
 
         return new RiskEvaluationResult(
                 savedEvaluation.getId(),

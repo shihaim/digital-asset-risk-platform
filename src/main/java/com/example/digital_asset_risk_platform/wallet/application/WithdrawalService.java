@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.wallet.application;
 
+import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
+import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.application.RiskCaseService;
 import com.example.digital_asset_risk_platform.risk.application.RiskEvaluationResult;
 import com.example.digital_asset_risk_platform.risk.application.RiskEvaluationService;
@@ -12,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,6 +25,7 @@ public class WithdrawalService {
     private final WithdrawalRequestRepository withdrawalRequestRepository;
     private final RiskEvaluationService riskEvaluationService;
     private final RiskCaseService riskCaseService;
+    private final DomainEventPublisher domainEventPublisher;
 
     public WithdrawalCreateResponse createWithdrawal(WithdrawalCreateRequest request) {
         WithdrawalRequest withdrawal = new WithdrawalRequest(
@@ -31,6 +37,19 @@ public class WithdrawalService {
         );
 
         WithdrawalRequest savedWithdrawal = withdrawalRequestRepository.save(withdrawal);
+
+        domainEventPublisher.publish(new WithdrawalRequestedEvent(
+                UUID.randomUUID().toString(),
+                savedWithdrawal.getId(),
+                savedWithdrawal.getUserId(),
+                savedWithdrawal.getAssetSymbol(),
+                savedWithdrawal.getChainType(),
+                savedWithdrawal.getToAddress(),
+                savedWithdrawal.getAmount(),
+                savedWithdrawal.getStatus().name(),
+                savedWithdrawal.getRequestedAt(),
+                LocalDateTime.now()
+        ));
 
         RiskEvaluationResult evaluationResult = riskEvaluationService.evaluationWithdrawal(savedWithdrawal);
 
