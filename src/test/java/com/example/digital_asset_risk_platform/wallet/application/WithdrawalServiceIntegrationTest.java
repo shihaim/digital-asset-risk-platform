@@ -7,6 +7,9 @@ import com.example.digital_asset_risk_platform.account.dto.LoginEventCreateReque
 import com.example.digital_asset_risk_platform.account.dto.SecurityEventCreateRequest;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
+import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
+import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
+import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
@@ -30,6 +33,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -38,6 +42,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 class WithdrawalServiceIntegrationTest extends IntegrationTestSupport {
@@ -248,5 +255,48 @@ class WithdrawalServiceIntegrationTest extends IntegrationTestSupport {
         Assertions.assertThat(riskCase.getStatus()).isEqualTo(RiskCaseStatus.REVIEW_REQUIRED);
         Assertions.assertThat(riskCase.getCaseType()).isEqualTo(RiskCaseType.AML_REVIEW);
         Assertions.assertThat(riskCase.getRiskLevel()).isEqualTo(RiskLevel.CRITICAL);
+    }
+
+    @Test
+    @DisplayName("출금 요청 시 WithdrawalRequestedEvent와 RiskEvaluationCompletedEvent를 발행한다")
+    void case4() {
+        //given
+        Long userId = 10001L;
+
+        walletRiskService.createWalletRisk(new WalletRiskCreateRequest("TRON", "TNORMAL000001", WalletRiskLevel.LOW, 0, "NORMAL", "MOCK_KYT"));
+
+        //when
+        withdrawalService.createWithdrawal(new WithdrawalCreateRequest(userId, "USDT", "TRON", "TNORMAL000001", new BigDecimal("100.000000000000000000")));
+
+        //then
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+
+        verify(domainEventPublisher, atLeastOnce()).publish(captor.capture());
+
+        Assertions.assertThat(captor.getAllValues())
+                .anyMatch(event -> event instanceof WithdrawalRequestedEvent)
+                .anyMatch(event -> event instanceof RiskEvaluationCompletedEvent);
+    }
+
+    @Test
+    @DisplayName("고위험 출금으로 Case가 생성되면 RiskCaseCreatedEvent를 발행한다")
+    void case5() {
+        //given
+        Long userId = 20001L;
+
+        walletRiskService.createWalletRisk(new WalletRiskCreateRequest("TRON", "THACKED000001", WalletRiskLevel.HIGH, 100, "HACKED_FUNDS", "MOCK_KYT"));
+
+        //when
+        withdrawalService.createWithdrawal(new WithdrawalCreateRequest(userId, "USDT", "TRON", "THACKED000001", new BigDecimal("10000.000000000000000000")));
+
+        //then
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+
+        verify(domainEventPublisher, atLeastOnce()).publish(captor.capture());
+
+        Assertions.assertThat(captor.getAllValues())
+                .anyMatch(event -> event instanceof WithdrawalRequestedEvent)
+                .anyMatch(event -> event instanceof RiskEvaluationCompletedEvent)
+                .anyMatch(event -> event instanceof RiskCaseCreatedEvent);
     }
 }
