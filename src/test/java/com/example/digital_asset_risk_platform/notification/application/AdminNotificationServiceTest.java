@@ -39,7 +39,7 @@ public class AdminNotificationServiceTest extends IntegrationTestSupport {
         adminNotificationService.createCaseCreatedNotificationIfNotExists(event);
 
         //then
-        Assertions.assertThat(adminNotificationRepository.count()).isEqualTo(1);
+        Assertions.assertThat(adminNotificationRepository.count()).isOne();
     }
 
     @Test
@@ -55,6 +55,6 @@ public class AdminNotificationServiceTest extends IntegrationTestSupport {
         adminNotificationService.createCaseCreatedNotificationIfNotExists(event);
 
         //then
-        Assertions.assertThat(adminNotificationRepository.count()).isEqualTo(1);
+        Assertions.assertThat(adminNotificationRepository.count()).isOne();
     }
 }

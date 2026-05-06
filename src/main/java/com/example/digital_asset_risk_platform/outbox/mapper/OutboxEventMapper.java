@@ -20,7 +20,7 @@ public class OutboxEventMapper {
         if (event instanceof WithdrawalRequestedEvent withdrawalEvent) {
             return new OutboxEvent(
                     withdrawalEvent.eventId(),
-                    "WithdrawalRequestEvent",
+                    "WithdrawalRequestedEvent",
                     KafkaTopicConfig.WITHDRAWAL_REQUESTED,
                     String.valueOf(withdrawalEvent.withdrawalId()),
                     toJson(withdrawalEvent),
@@ -31,7 +31,7 @@ public class OutboxEventMapper {
         if (event instanceof RiskEvaluationCompletedEvent evaluationEvent) {
             return new OutboxEvent(
                     evaluationEvent.eventId(),
-                    "RiskEvaluationCreatedEvent",
+                    "RiskEvaluationCompletedEvent",
                     KafkaTopicConfig.RISK_EVALUATION_COMPLETED,
                     String.valueOf(evaluationEvent.refId()),
                     toJson(evaluationEvent),

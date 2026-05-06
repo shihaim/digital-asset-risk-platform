@@ -9,6 +9,12 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
+    listener:
+      auto-startup: false
+
+outbox:
+  publisher:
+    fixed-delay-ms: 600000
 
 logging:
   level:

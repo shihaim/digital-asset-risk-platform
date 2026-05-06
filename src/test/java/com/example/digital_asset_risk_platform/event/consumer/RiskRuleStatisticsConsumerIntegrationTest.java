@@ -55,9 +55,9 @@ public class RiskRuleStatisticsConsumerIntegrationTest extends IntegrationTestSu
         //then
         RiskRuleStatistics highRiskWallet = riskRuleStatisticsRepository.findByRuleCode("HIGH_RISK_WALLET").orElseThrow();
 
-        Assertions.assertThat(highRiskWallet.getHitCount()).isEqualTo(1);
+        Assertions.assertThat(highRiskWallet.getHitCount()).isOne();
         Assertions.assertThat(riskRuleStatisticsRepository.count()).isEqualTo(3);
-        Assertions.assertThat(consumerProcessedEventRepository.count()).isEqualTo(1);
+        Assertions.assertThat(consumerProcessedEventRepository.count()).isOne();
         verify(acknowledgment).acknowledge();
     }
 
@@ -78,7 +78,7 @@ public class RiskRuleStatisticsConsumerIntegrationTest extends IntegrationTestSu
         //then
         RiskRuleStatistics statistics = riskRuleStatisticsRepository.findByRuleCode("HIGH_RISK_WALLET").orElseThrow();
 
-        Assertions.assertThat(statistics.getHitCount()).isEqualTo(1);
-        Assertions.assertThat(consumerProcessedEventRepository.count()).isEqualTo(1);
+        Assertions.assertThat(statistics.getHitCount()).isOne();
+        Assertions.assertThat(consumerProcessedEventRepository.count()).isOne();
     }
 }

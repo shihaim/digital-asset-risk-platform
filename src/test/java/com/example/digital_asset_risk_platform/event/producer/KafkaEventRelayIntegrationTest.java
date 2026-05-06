@@ -10,7 +10,6 @@ import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCreateReques
 import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,7 +18,8 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 import java.math.BigDecimal;
 import java.time.Duration;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 public class KafkaEventRelayIntegrationTest extends IntegrationTestSupport {
@@ -33,6 +33,7 @@ public class KafkaEventRelayIntegrationTest extends IntegrationTestSupport {
     @MockitoBean
     RiskEventProducer riskEventProducer;
 
+    // TODO: Kafka serialization
     @Test
     @DisplayName("트랜잭션 커밋 이후 도메인 이벤트를 Kafka Producer로 위임한다")
     void case1() {

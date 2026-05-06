@@ -35,7 +35,7 @@ class ProcessedEventServiceTest extends IntegrationTestSupport {
 
         //then
         Assertions.assertThat(processedEventService.isProcessed(consumerName, eventId)).isTrue();
-        Assertions.assertThat(consumerProcessedEventRepository.count()).isEqualTo(1);
+        Assertions.assertThat(consumerProcessedEventRepository.count()).isOne();
     }
 
     @Test
@@ -50,6 +50,6 @@ class ProcessedEventServiceTest extends IntegrationTestSupport {
         processedEventService.markProcessed(consumerName, eventId);
 
         //then
-        Assertions.assertThat(consumerProcessedEventRepository.count()).isEqualTo(1);
+        Assertions.assertThat(consumerProcessedEventRepository.count()).isOne();
     }
 }

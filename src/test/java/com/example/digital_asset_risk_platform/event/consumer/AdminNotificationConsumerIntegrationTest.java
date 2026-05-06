@@ -42,7 +42,7 @@ public class AdminNotificationConsumerIntegrationTest extends IntegrationTestSup
         adminNotificationConsumer.consume(event, acknowledgment);
 
         //then
-        Assertions.assertThat(adminNotificationRepository.count()).isEqualTo(1);
+        Assertions.assertThat(adminNotificationRepository.count()).isOne();
         verify(acknowledgment).acknowledge();
     }
 
@@ -59,6 +59,6 @@ public class AdminNotificationConsumerIntegrationTest extends IntegrationTestSup
         adminNotificationConsumer.consume(event, acknowledgment);
 
         //then
-        Assertions.assertThat(adminNotificationRepository.count()).isEqualTo(1);
+        Assertions.assertThat(adminNotificationRepository.count()).isOne();
     }
 }

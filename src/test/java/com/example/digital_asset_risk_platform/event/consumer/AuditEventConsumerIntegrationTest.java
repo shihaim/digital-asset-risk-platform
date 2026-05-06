@@ -46,7 +46,7 @@ public class AuditEventConsumerIntegrationTest extends IntegrationTestSupport {
         auditEventConsumer.consumeWithdrawalRequested(event, String.valueOf(event.withdrawalId()), acknowledgment);
 
         //then
-        Assertions.assertThat(auditEventLogRepository.count()).isEqualTo(1);
+        Assertions.assertThat(auditEventLogRepository.count()).isOne();
         verify(acknowledgment).acknowledge();
     }
 
@@ -63,6 +63,6 @@ public class AuditEventConsumerIntegrationTest extends IntegrationTestSupport {
         auditEventConsumer.consumeWithdrawalRequested(event, String.valueOf(event.withdrawalId()), acknowledgment);
 
         //then
-        Assertions.assertThat(auditEventLogRepository.count()).isEqualTo(1);
+        Assertions.assertThat(auditEventLogRepository.count()).isOne();
     }
 }

@@ -6,6 +6,7 @@ import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompleted
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 
@@ -20,8 +21,9 @@ import static org.mockito.Mockito.when;
 
 public class RiskEventProducerTest {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
-    private final RiskEventProducer producer = new RiskEventProducer(kafkaTemplate);
+    private final KafkaTemplate<String, Object> objectKafkaTemplate = mock(KafkaTemplate.class);
+    private final KafkaTemplate<String, String> stringKafkaTemplate = mock(KafkaTemplate.class);
+    private final RiskEventProducer producer = new RiskEventProducer(objectKafkaTemplate, stringKafkaTemplate);
     private final CompletableFuture<SendResult<String, Object>> future = new CompletableFuture<>();
 
     @Test
@@ -42,7 +44,7 @@ public class RiskEventProducerTest {
         );
 
         //when
-        when(kafkaTemplate.send(
+        when(objectKafkaTemplate.send(
                 KafkaTopicConfig.WITHDRAWAL_REQUESTED,
                 "1",
                 event
@@ -51,7 +53,7 @@ public class RiskEventProducerTest {
         producer.publishWithdrawalRequested(event);
 
         //then
-        verify(kafkaTemplate).send(
+        verify(objectKafkaTemplate).send(
                 KafkaTopicConfig.WITHDRAWAL_REQUESTED,
                 "1",
                 event
@@ -77,7 +79,7 @@ public class RiskEventProducerTest {
         );
 
         //when
-        when(kafkaTemplate.send(
+        when(objectKafkaTemplate.send(
                 KafkaTopicConfig.RISK_EVALUATION_COMPLETED,
                 "1",
                 event
@@ -86,7 +88,7 @@ public class RiskEventProducerTest {
         producer.publishRiskEvaluationCompleted(event);
 
         //then
-        verify(kafkaTemplate).send(
+        verify(objectKafkaTemplate).send(
                 KafkaTopicConfig.RISK_EVALUATION_COMPLETED,
                 "1",
                 event
@@ -110,7 +112,7 @@ public class RiskEventProducerTest {
         );
 
         //when
-        when(kafkaTemplate.send(
+        when(objectKafkaTemplate.send(
                 KafkaTopicConfig.RISK_CASE_CREATED,
                 "100",
                 event
@@ -119,10 +121,36 @@ public class RiskEventProducerTest {
         producer.publishRiskCaseCreated(event);
 
         //then
-        verify(kafkaTemplate).send(
+        verify(objectKafkaTemplate).send(
                 KafkaTopicConfig.RISK_CASE_CREATED,
                 "100",
                 event
         );
+    }
+
+    @Test
+    @DisplayName("Raw JSON payload를 지정한 topic과 key로 발행한다")
+    void case4() {
+        //given
+        String topic = KafkaTopicConfig.WITHDRAWAL_REQUESTED;
+        String key = "1";
+        String payloadJson = """
+            {
+              "eventId": "event-001",
+              "withdrawalId": 1,
+              "userId": 10001
+            }
+        """;
+
+        SendResult<String, String> sendResult = mock(SendResult.class);
+
+        when(stringKafkaTemplate.send(topic, key, payloadJson))
+                .thenReturn(CompletableFuture.completedFuture(sendResult));
+
+        //when
+        producer.publishRawJson(topic, key, payloadJson);
+
+        //then
+        verify(stringKafkaTemplate).send(topic, key, payloadJson);
     }
 }

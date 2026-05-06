@@ -39,7 +39,7 @@ class AuditEventLogServiceTest extends IntegrationTestSupport {
         auditEventLogService.saveIfNotExists(event.eventId(), "WithdrawalRequestedEvent", "withdrawal.requested", String.valueOf(event.withdrawalId()), event);
 
         //then
-        Assertions.assertThat(auditEventLogRepository.count()).isEqualTo(1);
+        Assertions.assertThat(auditEventLogRepository.count()).isOne();
     }
 
     @Test
@@ -55,6 +55,6 @@ class AuditEventLogServiceTest extends IntegrationTestSupport {
         auditEventLogService.saveIfNotExists(event.eventId(), "WithdrawalRequestedEvent", "withdrawal.requested", "1", event);
 
         //then
-        Assertions.assertThat(auditEventLogRepository.count()).isEqualTo(1);
+        Assertions.assertThat(auditEventLogRepository.count()).isOne();
     }
 }
