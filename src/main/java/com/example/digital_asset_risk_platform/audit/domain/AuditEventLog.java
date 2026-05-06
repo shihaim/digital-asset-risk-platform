@@ -47,7 +47,7 @@ public class AuditEventLog {
     private String messageKey;
 
     @Lob
-    @Column(name = "payload_json", nullable = false)
+    @Column(name = "payload_json", nullable = false, columnDefinition = "LONGTEXT")
     private String payloadJson;
 
     @Column(name = "consumed_at", nullable = false)

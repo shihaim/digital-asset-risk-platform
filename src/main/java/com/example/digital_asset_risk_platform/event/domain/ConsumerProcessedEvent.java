@@ -31,7 +31,7 @@ public class ConsumerProcessedEvent {
         @Column(name = "consumer_name", nullable = false, length = 100)
         private String consumerName;
 
-        @Column(name = "processed_at", nullable = false)
+        @Column(name = "event_id", nullable = false)
         private String eventId;
 
         @Column(name = "processed_at", nullable = false)
