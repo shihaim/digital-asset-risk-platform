@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class KafkaEventRelay {

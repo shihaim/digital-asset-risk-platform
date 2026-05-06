@@ -7,17 +7,21 @@ import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEven
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RiskEventProducer {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, Object> objectKafkaTemplate;
+    private final KafkaTemplate<String, String> stringKafkaTemplate;
 
     public void publishWithdrawalRequested(WithdrawalRequestedEvent event) {
-        kafkaTemplate.send(
+        objectKafkaTemplate.send(
                 KafkaTopicConfig.WITHDRAWAL_REQUESTED,
                 String.valueOf(event.withdrawalId()),
                 event
@@ -37,7 +41,7 @@ public class RiskEventProducer {
     }
 
     public void publishRiskEvaluationCompleted(RiskEvaluationCompletedEvent event) {
-        kafkaTemplate.send(
+        objectKafkaTemplate.send(
                 KafkaTopicConfig.RISK_EVALUATION_COMPLETED,
                 String.valueOf(event.refId()),
                 event
@@ -57,7 +61,7 @@ public class RiskEventProducer {
     }
 
     public void publishRiskCaseCreated(RiskCaseCreatedEvent event) {
-        kafkaTemplate.send(
+        objectKafkaTemplate.send(
                 KafkaTopicConfig.RISK_CASE_CREATED,
                 String.valueOf(event.caseId()),
                 event
@@ -74,5 +78,9 @@ public class RiskEventProducer {
                     result.getRecordMetadata().offset()
             );
         });
+    }
+
+    public CompletableFuture<SendResult<String, String>> publishRawJson(String topicName, String messageKey, String payloadJson) {
+        return stringKafkaTemplate.send(topicName, messageKey, payloadJson);
     }
 }
