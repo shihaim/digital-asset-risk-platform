@@ -9,7 +9,22 @@ public record WithdrawalCreateResponse(
         WithdrawalStatus status,
         RiskLevel riskLevel,
         RiskDecisionType decision,
-        int totalScore,
+        Integer totalScore,
         Long caseId
 ) {
+
+    public static WithdrawalCreateResponse evaluating(Long withdrawalId, WithdrawalStatus status) {
+        return new WithdrawalCreateResponse(
+                withdrawalId,
+                status,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    public static WithdrawalCreateResponse evaluated(Long withdrawalId, WithdrawalStatus status, RiskLevel riskLevel, RiskDecisionType decision, int totalScore, Long caseId) {
+        return new WithdrawalCreateResponse(withdrawalId, status, riskLevel, decision, totalScore, caseId);
+    }
 }

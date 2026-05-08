@@ -12,6 +12,7 @@ import com.example.digital_asset_risk_platform.admin.dto.RiskCaseReviewRequest;
 import com.example.digital_asset_risk_platform.admin.dto.RiskCaseSummaryResponse;
 import com.example.digital_asset_risk_platform.admin.dto.RiskTimelineEventResponse;
 import com.example.digital_asset_risk_platform.admin.dto.RuleHitResponse;
+import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseType;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -75,6 +77,9 @@ public class AdminRiskCaseServiceIntegrationTest extends IntegrationTestSupport 
 
     @Autowired
     AccountSecurityEventRepository accountSecurityEventRepository;
+
+    @MockitoBean
+    DomainEventPublisher domainEventPublisher;
 
     @BeforeEach
     void setUp() {

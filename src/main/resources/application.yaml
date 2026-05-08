@@ -24,18 +24,30 @@ spring:
       group-id: risk-platform
       auto-offset-reset: earliest
       enable-auto-commit: false
-      properties:
-        spring.json.trusted.packages: "com.example.riskplatform.*"
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringSerializer
     listener:
       ack-mode: manual
     producer:
       acks: all
       retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
 
   data:
     redis:
       host: localhost
       port: 6379
+
+outbox:
+  publisher:
+    fixed-delay-ms: 3000
+
+fds:
+  evaluation:
+    mode: async # sync/async
 
 management:
   endpoints:
