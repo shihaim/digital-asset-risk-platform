@@ -16,6 +16,10 @@ outbox:
   publisher:
     fixed-delay-ms: 600000
 
+fds:
+  evaluation:
+    mode: sync
+
 logging:
   level:
     org.hibernate.SQL: debug
