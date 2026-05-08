@@ -5,10 +5,12 @@ import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublis
 import com.example.digital_asset_risk_platform.risk.application.RiskCaseService;
 import com.example.digital_asset_risk_platform.risk.application.RiskEvaluationResult;
 import com.example.digital_asset_risk_platform.risk.application.RiskEvaluationService;
-import com.example.digital_asset_risk_platform.risk.domain.RiskDecisionType;
+import com.example.digital_asset_risk_platform.risk.config.FdsEvaluationProperties;
+import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalCreateRequest;
 import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalCreateResponse;
+import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalDetailResponse;
 import com.example.digital_asset_risk_platform.wallet.repository.WithdrawalRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,10 @@ public class WithdrawalService {
     private final WithdrawalRequestRepository withdrawalRequestRepository;
     private final RiskEvaluationService riskEvaluationService;
     private final RiskCaseService riskCaseService;
+    private final WithdrawalDecisionApplier withdrawalDecisionApplier;
     private final DomainEventPublisher domainEventPublisher;
+    private final FdsEvaluationProperties fdsEvaluationProperties;
+    private final RiskEvaluationRepository riskEvaluationRepository;
 
     public WithdrawalCreateResponse createWithdrawal(WithdrawalCreateRequest request) {
         WithdrawalRequest withdrawal = new WithdrawalRequest(
@@ -37,6 +42,25 @@ public class WithdrawalService {
         );
 
         WithdrawalRequest savedWithdrawal = withdrawalRequestRepository.save(withdrawal);
+
+        if (fdsEvaluationProperties.isAsyncMode()) {
+            savedWithdrawal.startEvaluation();
+
+            domainEventPublisher.publish(new WithdrawalRequestedEvent(
+                    UUID.randomUUID().toString(),
+                    savedWithdrawal.getId(),
+                    savedWithdrawal.getUserId(),
+                    savedWithdrawal.getAssetSymbol(),
+                    savedWithdrawal.getChainType(),
+                    savedWithdrawal.getToAddress(),
+                    savedWithdrawal.getAmount(),
+                    savedWithdrawal.getStatus().name(),
+                    savedWithdrawal.getRequestedAt(),
+                    LocalDateTime.now()
+            ));
+
+            return WithdrawalCreateResponse.evaluating(savedWithdrawal.getId(), savedWithdrawal.getStatus());
+        }
 
         domainEventPublisher.publish(new WithdrawalRequestedEvent(
                 UUID.randomUUID().toString(),
@@ -53,11 +77,11 @@ public class WithdrawalService {
 
         RiskEvaluationResult evaluationResult = riskEvaluationService.evaluationWithdrawal(savedWithdrawal);
 
-        applyDecision(savedWithdrawal, evaluationResult.decision());
+        withdrawalDecisionApplier.apply(savedWithdrawal, evaluationResult.decision());
 
         Long caseId = riskCaseService.createCaseIfNeeded(savedWithdrawal, evaluationResult);
 
-        return new WithdrawalCreateResponse(
+        return WithdrawalCreateResponse.evaluated(
                 savedWithdrawal.getId(),
                 savedWithdrawal.getStatus(),
                 evaluationResult.riskLevel(),
@@ -67,22 +91,23 @@ public class WithdrawalService {
         );
     }
 
-    private void applyDecision(WithdrawalRequest withdrawal, RiskDecisionType decision) {
-        if (decision == RiskDecisionType.ALLOW || decision == RiskDecisionType.MONITOR) {
-            withdrawal.approve();
-            return;
-        }
+    @Transactional(readOnly = true)
+    public WithdrawalDetailResponse getWithdrawal(Long withdrawalId) {
+        WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(withdrawalId)
+                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + withdrawalId));
 
-        if (decision == RiskDecisionType.REQUIRE_ADDITIONAL_AUTH || decision == RiskDecisionType.HOLD_WITHDRAWAL) {
-            withdrawal.hold();
-            return;
-        }
-
-        if (decision == RiskDecisionType.BLOCK_WITHDRAWAL) {
-            withdrawal.block();
-            return;
-        }
-
-        throw new IllegalStateException("Unsupported decision: " + decision);
+        return riskEvaluationRepository.findByRefTypeAndRefId("WITHDRAWAL", withdrawal.getId())
+                .map(evaluation -> WithdrawalDetailResponse.of(
+                        withdrawal,
+                        evaluation.getRiskLevel(),
+                        evaluation.getDecision(),
+                        evaluation.getTotalScore()
+                ))
+                .orElseGet(() -> WithdrawalDetailResponse.of(
+                        withdrawal,
+                        null,
+                        null,
+                        null
+                ));
     }
 }

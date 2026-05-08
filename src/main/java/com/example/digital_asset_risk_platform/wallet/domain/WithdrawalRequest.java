@@ -78,24 +78,56 @@ public class WithdrawalRequest {
 
 
     ///========================================///
+    public void startEvaluation() {
+        if (this.status != WithdrawalStatus.REQUESTED) {
+            throw new IllegalStateException("FDS 평가를 시작할 수 없는 출금 상태입니다: " + this.status);
+        }
+
+        this.status = WithdrawalStatus.EVALUATING;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public void approve() {
+        if (this.status != WithdrawalStatus.REQUESTED &&
+            this.status != WithdrawalStatus.EVALUATING &&
+            this.status != WithdrawalStatus.HELD &&
+            this.status != WithdrawalStatus.BLOCKED) {
+            throw new IllegalStateException("승인할 수 없는 출금 상태입니다: " + this.status);
+        }
+
         this.status = WithdrawalStatus.APPROVED;
         this.approvedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     public void hold() {
+        if (this.status != WithdrawalStatus.REQUESTED &&
+            this.status != WithdrawalStatus.EVALUATING) {
+            throw new IllegalStateException("보류할 수 없는 출금 상태입니다: " + this.status);
+        }
+
         this.status = WithdrawalStatus.HELD;
         this.updatedAt = LocalDateTime.now();
     }
 
     public void block() {
+        if (this.status != WithdrawalStatus.REQUESTED &&
+            this.status != WithdrawalStatus.EVALUATING) {
+            throw new IllegalStateException("차단할 수 없는 출금 상태입니다: " + this.status);
+        }
+
         this.status = WithdrawalStatus.BLOCKED;
         this.rejectedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     public void reject() {
+        if (this.status != WithdrawalStatus.HELD &&
+            this.status != WithdrawalStatus.BLOCKED &&
+            this.status != WithdrawalStatus.EVALUATING) {
+            throw new IllegalStateException("거절할 수 없는 출금 상태입니다: " + this.status);
+        }
+
         this.status = WithdrawalStatus.REJECTED;
         this.rejectedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();

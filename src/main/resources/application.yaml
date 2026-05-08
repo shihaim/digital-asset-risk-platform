@@ -26,9 +26,6 @@ spring:
       enable-auto-commit: false
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-#      properties:
-#        spring.json.trusted.packages: "com.example.digital_asset_risk_platform.event.dto"
     listener:
       ack-mode: manual
     producer:
@@ -47,6 +44,10 @@ spring:
 outbox:
   publisher:
     fixed-delay-ms: 3000
+
+fds:
+  evaluation:
+    mode: async # sync/async
 
 management:
   endpoints:

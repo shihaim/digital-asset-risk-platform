@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface RiskEvaluationRepository extends JpaRepository<RiskEvaluation, Long> {
     Optional<RiskEvaluation> findByRefTypeAndRefId(String refType, Long refId);
+
+    boolean existsByRefTypeAndRefId(String refType, Long refId);
 }
