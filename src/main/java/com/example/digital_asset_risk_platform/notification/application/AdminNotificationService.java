@@ -1,4 +1,4 @@
-package com.example.digital_asset_risk_platform.notification.applicaiton;
+package com.example.digital_asset_risk_platform.notification.application;
 
 import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
 import com.example.digital_asset_risk_platform.notification.domain.AdminNotification;

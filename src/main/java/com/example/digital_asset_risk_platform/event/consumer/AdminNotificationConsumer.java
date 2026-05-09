@@ -2,7 +2,7 @@ package com.example.digital_asset_risk_platform.event.consumer;
 
 import com.example.digital_asset_risk_platform.event.config.KafkaTopicConfig;
 import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
-import com.example.digital_asset_risk_platform.notification.applicaiton.AdminNotificationService;
+import com.example.digital_asset_risk_platform.notification.application.AdminNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;

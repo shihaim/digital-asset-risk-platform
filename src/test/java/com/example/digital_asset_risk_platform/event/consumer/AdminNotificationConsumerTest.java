@@ -1,7 +1,7 @@
 package com.example.digital_asset_risk_platform.event.consumer;
 
 import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
-import com.example.digital_asset_risk_platform.notification.applicaiton.AdminNotificationService;
+import com.example.digital_asset_risk_platform.notification.application.AdminNotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.support.Acknowledgment;

@@ -2,7 +2,6 @@ package com.example.digital_asset_risk_platform.notification.application;
 
 import com.example.digital_asset_risk_platform.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
-import com.example.digital_asset_risk_platform.notification.applicaiton.AdminNotificationService;
 import com.example.digital_asset_risk_platform.notification.repository.AdminNotificationRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
