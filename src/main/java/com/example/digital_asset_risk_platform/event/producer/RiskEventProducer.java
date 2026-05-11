@@ -6,6 +6,7 @@ import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompleted
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,9 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class RiskEventProducer {
 
+    @Qualifier("objectKafkaTemplate")
     private final KafkaTemplate<String, Object> objectKafkaTemplate;
+    @Qualifier("stringKafkaTemplate")
     private final KafkaTemplate<String, String> stringKafkaTemplate;
 
     public void publishWithdrawalRequested(WithdrawalRequestedEvent event) {
