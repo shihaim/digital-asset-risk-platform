@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.wallet.application;
 
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.application.RiskCaseService;
@@ -94,7 +96,7 @@ public class WithdrawalService {
     @Transactional(readOnly = true)
     public WithdrawalDetailResponse getWithdrawal(Long withdrawalId) {
         WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(withdrawalId)
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + withdrawalId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         return riskEvaluationRepository.findByRefTypeAndRefId("WITHDRAWAL", withdrawal.getId())
                 .map(evaluation -> WithdrawalDetailResponse.of(

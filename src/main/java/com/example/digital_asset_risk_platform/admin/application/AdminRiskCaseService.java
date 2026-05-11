@@ -7,6 +7,8 @@ import com.example.digital_asset_risk_platform.admin.dto.RiskEvaluationInfoRespo
 import com.example.digital_asset_risk_platform.admin.dto.RiskTimelineEventResponse;
 import com.example.digital_asset_risk_platform.admin.dto.RuleHitResponse;
 import com.example.digital_asset_risk_platform.admin.dto.WithdrawalInfoResponse;
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
 import com.example.digital_asset_risk_platform.risk.domain.RiskEvaluation;
@@ -46,13 +48,13 @@ public class AdminRiskCaseService {
     @Transactional(readOnly = true)
     public RiskCaseDetailResponse getRiskCaseDetail(Long caseId) {
         RiskCase riskCase = riskCaseRepository.findById(caseId)
-                .orElseThrow(() -> new IllegalArgumentException("RiskCase를 찾을 수 없습니다. caseId=" + caseId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_CASE_NOT_FOUND));
 
         RiskEvaluation evaluation = riskEvaluationRepository.findById(riskCase.getEvaluationId())
-                .orElseThrow(() -> new IllegalArgumentException("RiskEvaluation을 찾을 수 없습니다. evaluationId=" + riskCase.getEvaluationId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_EVALUATION_NOT_FOUND));
 
         WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(evaluation.getRefId())
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + evaluation.getRefId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         List<RiskRuleHit> ruleHits = riskRuleHitRepository.findByEvaluationId(evaluation.getId());
 
@@ -69,20 +71,20 @@ public class AdminRiskCaseService {
 
     public void startReview(Long caseId, RiskCaseReviewRequest request) {
         RiskCase riskCase = riskCaseRepository.findById(caseId)
-                .orElseThrow(() -> new IllegalArgumentException("RiskCase를 찾을 수 없습니다. caseId=" + caseId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_CASE_NOT_FOUND));
 
         riskCase.startReview(request.reviewer());
     }
 
     public void approve(Long caseId, RiskCaseReviewRequest request) {
         RiskCase riskCase = riskCaseRepository.findById(caseId)
-                .orElseThrow(() -> new IllegalArgumentException("RiskCase를 찾을 수 없습니다. caseId=" + caseId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_CASE_NOT_FOUND));
 
         RiskEvaluation evaluation = riskEvaluationRepository.findById(riskCase.getEvaluationId())
-                .orElseThrow(() -> new IllegalArgumentException("RiskEvaluation을 찾을 수 없습니다. evaluationId=" + riskCase.getEvaluationId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_EVALUATION_NOT_FOUND));
 
         WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(evaluation.getRefId())
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + evaluation.getRefId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         riskCase.approve(request.reviewer(), request.comment());
         withdrawal.approve();
@@ -90,13 +92,13 @@ public class AdminRiskCaseService {
 
     public void reject(Long caseId, RiskCaseReviewRequest request) {
         RiskCase riskCase = riskCaseRepository.findById(caseId)
-                .orElseThrow(() -> new IllegalArgumentException("RiskCase를 찾을 수 없습니다. caseId=" + caseId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_CASE_NOT_FOUND));
 
         RiskEvaluation evaluation = riskEvaluationRepository.findById(riskCase.getEvaluationId())
-                .orElseThrow(() -> new IllegalArgumentException("RiskEvaluation을 찾을 수 없습니다. evaluationId=" + riskCase.getEvaluationId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_EVALUATION_NOT_FOUND));
 
         WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(evaluation.getRefId())
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + evaluation.getRefId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         riskCase.reject(request.reviewer(), request.comment());
         withdrawal.reject();
@@ -104,13 +106,13 @@ public class AdminRiskCaseService {
 
     public void markFalsePositive(Long caseId, RiskCaseReviewRequest request) {
         RiskCase riskCase = riskCaseRepository.findById(caseId)
-                .orElseThrow(() -> new IllegalArgumentException("RiskCase를 찾을 수 없습니다. caseId=" + caseId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_CASE_NOT_FOUND));
 
         RiskEvaluation evaluation = riskEvaluationRepository.findById(riskCase.getEvaluationId())
-                .orElseThrow(() -> new IllegalArgumentException("RiskEvaluation을 찾을 수 없습니다. evaluationId=" + riskCase.getEvaluationId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_EVALUATION_NOT_FOUND));
 
         WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(evaluation.getRefId())
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + evaluation.getRefId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         riskCase.markFalsePositive(request.reviewer(), request.comment());
         withdrawal.approve();
@@ -118,13 +120,13 @@ public class AdminRiskCaseService {
 
     public void markTruePositive(Long caseId, RiskCaseReviewRequest request) {
         RiskCase riskCase = riskCaseRepository.findById(caseId)
-                .orElseThrow(() -> new IllegalArgumentException("RiskCase를 찾을 수 없습니다. caseId=" + caseId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_CASE_NOT_FOUND));
 
         RiskEvaluation evaluation = riskEvaluationRepository.findById(riskCase.getEvaluationId())
-                .orElseThrow(() -> new IllegalArgumentException("RiskEvaluation을 찾을 수 없습니다. evaluationId=" + riskCase.getEvaluationId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_EVALUATION_NOT_FOUND));
 
         WithdrawalRequest withdrawal = withdrawalRequestRepository.findById(evaluation.getRefId())
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + evaluation.getRefId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         riskCase.markTruePositive(request.reviewer(), request.comment());
         withdrawal.reject();

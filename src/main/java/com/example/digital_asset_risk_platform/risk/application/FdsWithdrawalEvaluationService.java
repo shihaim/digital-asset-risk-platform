@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.risk.application;
 
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import com.example.digital_asset_risk_platform.event.application.ProcessedEventService;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
@@ -32,7 +34,7 @@ public class FdsWithdrawalEvaluationService {
 
         WithdrawalRequest withdrawal = withdrawalRequestRepository
                 .findById(event.withdrawalId())
-                .orElseThrow(() -> new IllegalArgumentException("출금 요청을 찾을 수 없습니다. withdrawalId=" + event.withdrawalId()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.WITHDRAWAL_NOT_FOUND));
 
         if (riskEvaluationRepository.existsByRefTypeAndRefId("WITHDRAWAL", withdrawal.getId())) {
             processedEventService.markProcessed(CONSUMER_NAME, event.eventId());

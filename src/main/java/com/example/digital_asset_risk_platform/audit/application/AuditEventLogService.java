@@ -2,6 +2,8 @@ package com.example.digital_asset_risk_platform.audit.application;
 
 import com.example.digital_asset_risk_platform.audit.domain.AuditEventLog;
 import com.example.digital_asset_risk_platform.audit.repository.AuditEventLogRepository;
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,7 @@ public class AuditEventLogService {
         try {
             return objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("이벤트 payload JSON 변환에 실패했습니다.", e);
+            throw new BusinessException(ErrorCode.EVENT_PAYLOAD_CONVERT_FAILED, "이벤트 payload JSON 변환에 실패했습니다.", e);
         }
     }
 }

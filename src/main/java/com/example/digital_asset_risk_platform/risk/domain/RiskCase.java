@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.risk.domain;
 
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -78,7 +80,7 @@ public class RiskCase {
     ///========================================///
     public void startReview(String reviewer) {
         if (this.status != RiskCaseStatus.REVIEW_REQUIRED) {
-            throw new IllegalStateException("심사를 시작할 수 없는 Case 상태입니다: " + this.status);
+            throw new BusinessException(ErrorCode.RISK_EVALUATION_NOT_FOUND, "심사를 시작할 수 없는 Case 상태입니다: " + this.status);
         }
 
         this.status = RiskCaseStatus.IN_REVIEW;

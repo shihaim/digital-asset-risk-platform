@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.outbox.mapper;
 
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import com.example.digital_asset_risk_platform.event.config.KafkaTopicConfig;
 import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
 import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
@@ -50,14 +52,14 @@ public class OutboxEventMapper {
             );
         }
 
-        throw new IllegalArgumentException("지원하지 않는 Outbox 이벤트 타입입니다: " + event.getClass().getName());
+        throw new BusinessException(ErrorCode.UNSUPPORTED_OUTBOX_EVENT_TYPE, "지원하지 않는 Outbox 이벤트 타입입니다: " + event.getClass().getName());
     }
 
     private String toJson(Object event) {
         try {
             return objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Outbox 이벤트 JSON 변환에 실패했습니다.", e);
+            throw new BusinessException(ErrorCode.EVENT_PAYLOAD_CONVERT_FAILED, "Outbox 이벤트 JSON 변환에 실패했습니다.", e);
         }
     }
 }

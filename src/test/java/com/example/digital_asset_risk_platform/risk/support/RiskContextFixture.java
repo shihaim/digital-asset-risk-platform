@@ -1,6 +1,6 @@
 package com.example.digital_asset_risk_platform.risk.support;
 
-import com.example.digital_asset_risk_platform.risk.application.AccountRiskSnapshot;
+import com.example.digital_asset_risk_platform.risk.context.AccountRiskSnapshot;
 import com.example.digital_asset_risk_platform.risk.application.WalletRiskSnapshot;
 import com.example.digital_asset_risk_platform.risk.context.RiskContext;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;

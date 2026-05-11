@@ -1,12 +1,12 @@
 package com.example.digital_asset_risk_platform.outbox.mapper;
 
 import com.example.digital_asset_risk_platform.common.config.TestObjectMapperFactory;
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
 import com.example.digital_asset_risk_platform.event.config.KafkaTopicConfig;
 import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
 import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,7 +116,7 @@ class OutboxEventMapperTest {
 
         //when&then
         Assertions.assertThatThrownBy(() -> outboxEventMapper.toOutboxEvent(unsupportedEvent))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("지원하지 않는 Outbox 이벤트 타입");
     }
 }

@@ -1,5 +1,7 @@
 package com.example.digital_asset_risk_platform.wallet.domain;
 
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -80,7 +82,7 @@ public class WithdrawalRequest {
     ///========================================///
     public void startEvaluation() {
         if (this.status != WithdrawalStatus.REQUESTED) {
-            throw new IllegalStateException("FDS 평가를 시작할 수 없는 출금 상태입니다: " + this.status);
+            throw new BusinessException(ErrorCode.INVALID_WITHDRAWAL_STATUS, "FDS 평가를 시작할 수 없는 출금 상태입니다: " + this.status);
         }
 
         this.status = WithdrawalStatus.EVALUATING;
@@ -92,7 +94,7 @@ public class WithdrawalRequest {
             this.status != WithdrawalStatus.EVALUATING &&
             this.status != WithdrawalStatus.HELD &&
             this.status != WithdrawalStatus.BLOCKED) {
-            throw new IllegalStateException("승인할 수 없는 출금 상태입니다: " + this.status);
+            throw new BusinessException(ErrorCode.INVALID_WITHDRAWAL_STATUS, "승인할 수 없는 출금 상태입니다: " + this.status);
         }
 
         this.status = WithdrawalStatus.APPROVED;
@@ -103,7 +105,7 @@ public class WithdrawalRequest {
     public void hold() {
         if (this.status != WithdrawalStatus.REQUESTED &&
             this.status != WithdrawalStatus.EVALUATING) {
-            throw new IllegalStateException("보류할 수 없는 출금 상태입니다: " + this.status);
+            throw new BusinessException(ErrorCode.INVALID_WITHDRAWAL_STATUS, "보류할 수 없는 출금 상태입니다: " + this.status);
         }
 
         this.status = WithdrawalStatus.HELD;
@@ -113,7 +115,7 @@ public class WithdrawalRequest {
     public void block() {
         if (this.status != WithdrawalStatus.REQUESTED &&
             this.status != WithdrawalStatus.EVALUATING) {
-            throw new IllegalStateException("차단할 수 없는 출금 상태입니다: " + this.status);
+            throw new BusinessException(ErrorCode.INVALID_WITHDRAWAL_STATUS, "차단할 수 없는 출금 상태입니다: " + this.status);
         }
 
         this.status = WithdrawalStatus.BLOCKED;
@@ -125,7 +127,7 @@ public class WithdrawalRequest {
         if (this.status != WithdrawalStatus.HELD &&
             this.status != WithdrawalStatus.BLOCKED &&
             this.status != WithdrawalStatus.EVALUATING) {
-            throw new IllegalStateException("거절할 수 없는 출금 상태입니다: " + this.status);
+            throw new BusinessException(ErrorCode.INVALID_WITHDRAWAL_STATUS, "거절할 수 없는 출금 상태입니다: " + this.status);
         }
 
         this.status = WithdrawalStatus.REJECTED;

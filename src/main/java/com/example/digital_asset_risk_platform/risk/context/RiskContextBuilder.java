@@ -4,7 +4,6 @@ import com.example.digital_asset_risk_platform.account.domain.AccountLoginEvent;
 import com.example.digital_asset_risk_platform.account.domain.SecurityEventType;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
-import com.example.digital_asset_risk_platform.risk.application.AccountRiskSnapshot;
 import com.example.digital_asset_risk_platform.risk.application.WalletRiskSnapshot;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
