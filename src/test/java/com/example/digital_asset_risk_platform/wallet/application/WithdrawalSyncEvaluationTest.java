@@ -1,6 +1,5 @@
 package com.example.digital_asset_risk_platform.wallet.application;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
 import com.example.digital_asset_risk_platform.event.repository.ConsumerProcessedEventRepository;
@@ -11,6 +10,7 @@ import com.example.digital_asset_risk_platform.risk.domain.RiskLevel;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalStatus;

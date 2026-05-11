@@ -1,9 +1,8 @@
 package com.example.digital_asset_risk_platform.outbox.application;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
-import com.example.digital_asset_risk_platform.outbox.domain.OutboxEvent;
 import com.example.digital_asset_risk_platform.outbox.repository.OutboxEventRepository;
 import com.example.digital_asset_risk_platform.outbox.support.OutboxRollbackTestService;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

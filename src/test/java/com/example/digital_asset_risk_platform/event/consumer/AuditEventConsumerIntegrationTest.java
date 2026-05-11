@@ -1,22 +1,21 @@
 package com.example.digital_asset_risk_platform.event.consumer;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.audit.repository.AuditEventLogRepository;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 public class AuditEventConsumerIntegrationTest extends IntegrationTestSupport {

@@ -1,6 +1,5 @@
 package com.example.digital_asset_risk_platform.admin.application;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.account.application.AccountEventService;
 import com.example.digital_asset_risk_platform.account.domain.SecurityEventType;
 import com.example.digital_asset_risk_platform.account.dto.LoginEventCreateRequest;
@@ -9,6 +8,7 @@ import com.example.digital_asset_risk_platform.account.repository.AccountLoginEv
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
 import com.example.digital_asset_risk_platform.admin.dto.RiskTimelineEventResponse;
 import com.example.digital_asset_risk_platform.admin.dto.RiskTimelineResponse;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import com.example.digital_asset_risk_platform.wallet.repository.WithdrawalRequestRepository;
 import org.assertj.core.api.Assertions;

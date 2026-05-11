@@ -1,6 +1,6 @@
 package com.example.digital_asset_risk_platform.event.consumer;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

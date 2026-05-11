@@ -1,6 +1,6 @@
 package com.example.digital_asset_risk_platform.wallet.controller;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

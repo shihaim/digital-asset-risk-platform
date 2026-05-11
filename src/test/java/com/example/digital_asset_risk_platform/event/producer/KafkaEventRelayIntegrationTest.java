@@ -1,8 +1,8 @@
 package com.example.digital_asset_risk_platform.event.producer;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
 import com.example.digital_asset_risk_platform.wallet.application.WithdrawalService;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;

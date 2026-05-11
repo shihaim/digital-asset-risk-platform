@@ -1,11 +1,11 @@
 package com.example.digital_asset_risk_platform.outbox.application;
 
-import com.example.digital_asset_risk_platform.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.event.producer.RiskEventProducer;
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEvent;
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEventStatus;
 import com.example.digital_asset_risk_platform.outbox.repository.OutboxEventRepository;
+import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 class OutboxEventPublisherTest extends IntegrationTestSupport {
