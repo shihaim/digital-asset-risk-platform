@@ -11,18 +11,13 @@ spring:
     listener:
       auto-startup: false
 
-outbox:
-  publisher:
-    fixed-delay-ms: 600000
-
 fds:
   evaluation:
     mode: sync
 
-#logging:
-#  level:
-#    org.hibernate.SQL: debug
-#    org.hibernate.orm.jdbc.bind: trace
+outbox:
+  publisher:
+    fixed-delay-ms: 600000
 
 logging:
   level:

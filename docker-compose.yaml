@@ -1,26 +1,50 @@
 services:
   mariadb:
-    image: mariadb:11
-    container_name: fds-mariadb
-    environment:
-      MARIADB_DATABASE: fds
-      MARIADB_USER: fds
-      MARIADB_PASSWORD: fds1234!
-      MARIADB_ROOT_PASSWORD: root1234!
+    image: mariadb:11.4
+    container_name: risk-platform-mariadb
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MARIADB_DATABASE: ${MYSQL_DATABASE:-risk_platform}
+      MARIADB_USER: ${MYSQL_USER:-risk_user}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD:-risk_password}
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --lower_case_table_names=1
+    volumes:
+      - risk-platform-mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - risk-platform-network
 
   redis:
-    image: redis:7-alpine
-    container_name: fds-redis
+    image: redis:7.2-alpine
+    container_name: risk-platform-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    volumes:
+      - risk-platform-redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - risk-platform-network
 
   kafka:
     image: apache/kafka:3.8.1
-    container_name: fds-kafka
+    container_name: risk-platform-kafka
+    hostname: kafka
     ports:
-      - "9092:9092"
+      - "${KAFKA_PORT:-9092}:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -30,19 +54,43 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - risk-platform-kafka-data:/tmp/kraft-combined-logs
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - risk-platform-network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: fds-kafka-ui
+    container_name: risk-platform-kafka-ui
     ports:
-      - "8085:8080"
+      - "${KAFKA_UI_PORT:-8085}:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+    networks:
+      - risk-platform-network
+
+volumes:
+  risk-platform-mariadb-data:
+  risk-platform-redis-data:
+  risk-platform-kafka-data:
+
+networks:
+  risk-platform-network:
+    driver: bridge

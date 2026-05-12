@@ -2,55 +2,19 @@ spring:
   application:
     name: digital-asset-risk-platform
 
-  datasource:
-    url: jdbc:mariadb://localhost:3306/fds
-    username: fds
-    password: fds1234!
-    driver-class-name: org.mariadb.jdbc.Driver
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-        jdbc:
-          time_zone: Asia/Seoul
-    open-in-view: false
-
-  kafka:
-    bootstrap-servers: localhost:9092
-
-    consumer:
-      group-id: risk-platform
-      auto-offset-reset: earliest
-      enable-auto-commit: false
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
-    listener:
-      ack-mode: manual
-
-    producer:
-      acks: all
-      retries: 3
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
-outbox:
-  publisher:
-    fixed-delay-ms: 3000
+server:
+  port: ${SERVER_PORT:8080}
 
 fds:
   evaluation:
-    mode: async # sync/async
+    mode: ${FDS_EVALUATION_MODE:sync}
+
+outbox:
+  publisher:
+    fixed-delay-ms: ${OUTBOX_PUBLISHER_FIXED_DELAY_MS:3000}
 
 management:
   endpoints:
@@ -59,4 +23,4 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: always
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:when_authorized}
