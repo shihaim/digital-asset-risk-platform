@@ -32,17 +32,49 @@ public class OutboxEventPublisher {
                 MAX_RETRY_COUNT,
                 PageRequest.of(0, BATCH_SIZE));
 
+        log.info("Outbox publish batch started. size={}", events.size());
+
         for (OutboxEvent event : events) {
             try {
+                log.info(
+                        "Outbox event publishing. eventId={}, eventType={}, topicName={}, messageKey={}, retryCount={}",
+                        event.getEventId(),
+                        event.getEventType(),
+                        event.getTopicName(),
+                        event.getMessageKey(),
+                        event.getRetryCount()
+                );
+
                 event.markProcessing();
 
                 riskEventProducer.publishRawJson(event.getTopicName(), event.getMessageKey(), event.getPayloadJson()).get();
 
                 event.markSent();
+
+                log.info(
+                        "Outbox event published. eventId={}, eventType={}, topicName={}, status={}, retryCount={}",
+                        event.getEventId(),
+                        event.getEventType(),
+                        event.getTopicName(),
+                        event.getStatus(),
+                        event.getRetryCount()
+                );
             } catch (Exception e) {
-                log.error("Failed to publish {}. messageKey={}", event.getTopicName(), event.getMessageKey(), e);
                 event.markFailed(e.getMessage());
+
+                log.error(
+                        "Outbox event publish failed. eventId={}, eventType={}, topicName={}, status={}, retryCount={}, errorMessage={}",
+                        event.getEventId(),
+                        event.getEventType(),
+                        event.getTopicName(),
+                        event.getStatus(),
+                        event.getRetryCount(),
+                        e.getMessage(),
+                        e
+                );
             }
         }
+
+        log.info("Outbox publish batch completed. size={}", events.size());
     }
 }

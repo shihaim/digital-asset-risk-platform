@@ -19,7 +19,15 @@ fds:
   evaluation:
     mode: sync
 
+#logging:
+#  level:
+#    org.hibernate.SQL: debug
+#    org.hibernate.orm.jdbc.bind: trace
+
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    root: INFO
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN
+    org.testcontainers: INFO
+    com.example.digital_asset_risk_platform: INFO

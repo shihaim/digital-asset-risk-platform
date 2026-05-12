@@ -9,12 +9,14 @@ import com.example.digital_asset_risk_platform.risk.domain.RiskLevel;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -28,6 +30,14 @@ public class RiskCaseService {
         boolean needCase = decision == RiskDecisionType.HOLD_WITHDRAWAL || decision == RiskDecisionType.BLOCK_WITHDRAWAL;
 
         if (!needCase) {
+            log.info(
+                    "RiskCase not required. withdrawalId={}, userId={}, decision={}, riskLevel={}",
+                    withdrawal.getId(),
+                    withdrawal.getUserId(),
+                    decision,
+                    evaluationResult.riskLevel()
+            );
+
             return null;
         }
 
@@ -41,6 +51,17 @@ public class RiskCaseService {
         );
 
         RiskCase savedCase = riskCaseRepository.save(riskCase);
+
+        log.info(
+                "RiskCase created. caseId={}, evaluationId={}, withdrawalId={}, userId={}, caseType={}, riskLevel={}, status={}",
+                savedCase.getId(),
+                savedCase.getEvaluationId(),
+                withdrawal.getId(),
+                savedCase.getUserId(),
+                savedCase.getCaseType(),
+                savedCase.getRiskLevel(),
+                savedCase.getStatus()
+        );
 
         domainEventPublisher.publish(new RiskCaseCreatedEvent(
                 UUID.randomUUID().toString(),

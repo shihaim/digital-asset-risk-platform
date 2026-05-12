@@ -5,10 +5,12 @@ import com.example.digital_asset_risk_platform.event.config.KafkaTopicConfig;
 import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
 import com.example.digital_asset_risk_platform.statistics.application.RiskRuleStatisticsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RiskRuleStatisticsConsumer {
@@ -25,9 +27,23 @@ public class RiskRuleStatisticsConsumer {
     )
     public void consume(RiskEvaluationCompletedEvent event, Acknowledgment acknowledgment) {
         if (processedEventService.isProcessed(CONSUMER_NAME, event.eventId())) {
+            log.warn(
+                    "Duplicate rule statistics event skipped. consumerName={}, eventId={}, ruleCodes={}",
+                    CONSUMER_NAME,
+                    event.eventId(),
+                    event.ruleCodes()
+            );
+
             acknowledgment.acknowledge();
             return;
         }
+
+        log.info(
+                "Risk rule statistics event consumed. eventId={}, evaluationId={}, ruleCodes={}",
+                event.eventId(),
+                event.evaluationId(),
+                event.ruleCodes()
+        );
         
         event.ruleCodes().forEach(ruleCode -> riskRuleStatisticsService.increaseRuleHit(ruleCode, event.evaluatedAt()));
 

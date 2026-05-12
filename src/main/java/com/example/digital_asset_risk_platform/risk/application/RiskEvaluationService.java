@@ -14,6 +14,7 @@ import com.example.digital_asset_risk_platform.risk.rule.RiskRule;
 import com.example.digital_asset_risk_platform.risk.rule.RuleHit;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -35,6 +37,12 @@ public class RiskEvaluationService {
     private final DomainEventPublisher domainEventPublisher;
 
     public RiskEvaluationResult evaluationWithdrawal(WithdrawalRequest withdrawal) {
+        log.info(
+                "Risk evaluation started. refType=WITHDRAWAL, withdrawalId={}, userId={}",
+                withdrawal.getId(),
+                withdrawal.getUserId()
+        );
+
         RiskContext context = riskContextBuilder.build(withdrawal);
 
         List<RuleHit> hits = rules.stream()
@@ -67,6 +75,27 @@ public class RiskEvaluationService {
                 .toList();
 
         riskRuleHitRepository.saveAll(ruleHitEntities);
+
+        log.info(
+                "Risk evaluation completed. evaluationId={}, withdrawalId={}, userId={}, riskLevel={}, decision={}, totalScore={}",
+                savedEvaluation.getId(),
+                withdrawal.getId(),
+                withdrawal.getUserId(),
+                decision.riskLevel(),
+                decision.decisionType(),
+                decision.totalScore()
+        );
+
+        if (log.isDebugEnabled()) {
+            hits.forEach(hit -> log.debug(
+                    "Risk rule hit detail. withdrawalId={}, ruleCode={}, score={}, blocking={}, reason={}",
+                    withdrawal.getId(),
+                    hit.ruleCode(),
+                    hit.score(),
+                    hit.blocking(),
+                    hit.reason()
+            ));
+        }
 
         domainEventPublisher.publish(new RiskEvaluationCompletedEvent(
                 UUID.randomUUID().toString(),

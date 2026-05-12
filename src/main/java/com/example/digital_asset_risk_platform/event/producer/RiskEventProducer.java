@@ -84,6 +84,12 @@ public class RiskEventProducer {
     }
 
     public CompletableFuture<SendResult<String, String>> publishRawJson(String topicName, String messageKey, String payloadJson) {
+        log.debug(
+                "Kafka send requested. topicName={}, messageKey={}",
+                topicName,
+                messageKey
+        );
+
         return stringKafkaTemplate.send(topicName, messageKey, payloadJson);
     }
 }
