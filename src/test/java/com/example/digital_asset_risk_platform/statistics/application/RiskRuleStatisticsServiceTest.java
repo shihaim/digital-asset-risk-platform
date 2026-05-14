@@ -8,11 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
-@ActiveProfiles("test")
 class RiskRuleStatisticsServiceTest extends IntegrationTestSupport {
 
     @Autowired

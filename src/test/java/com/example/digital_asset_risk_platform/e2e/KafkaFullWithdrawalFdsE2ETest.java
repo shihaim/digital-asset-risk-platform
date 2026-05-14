@@ -34,8 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import java.math.BigDecimal;
@@ -45,11 +43,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = {
-        "spring.kafka.listener.auto-startup=true",
-        "fds.evaluation.mode=async"
-})
-@ActiveProfiles("test")
 public class KafkaFullWithdrawalFdsE2ETest extends KafkaIntegrationTestSupport {
 
     @Autowired

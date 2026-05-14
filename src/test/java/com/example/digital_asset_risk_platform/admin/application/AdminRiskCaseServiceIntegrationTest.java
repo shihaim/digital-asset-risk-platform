@@ -6,11 +6,7 @@ import com.example.digital_asset_risk_platform.account.dto.LoginEventCreateReque
 import com.example.digital_asset_risk_platform.account.dto.SecurityEventCreateRequest;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
-import com.example.digital_asset_risk_platform.admin.dto.RiskCaseDetailResponse;
-import com.example.digital_asset_risk_platform.admin.dto.RiskCaseReviewRequest;
-import com.example.digital_asset_risk_platform.admin.dto.RiskCaseSummaryResponse;
-import com.example.digital_asset_risk_platform.admin.dto.RiskTimelineEventResponse;
-import com.example.digital_asset_risk_platform.admin.dto.RuleHitResponse;
+import com.example.digital_asset_risk_platform.admin.dto.*;
 import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
@@ -34,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
@@ -42,7 +37,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@ActiveProfiles("test")
 public class AdminRiskCaseServiceIntegrationTest extends IntegrationTestSupport {
 
     @Autowired

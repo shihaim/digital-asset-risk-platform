@@ -54,8 +54,11 @@
 - OutboxEvent 저장
 - Kafka 발행 성공 시 `SENT`
 - Kafka 발행 실패 시 `FAILED`
+- 최대 재시도 횟수 도달 시 `DEAD`
 - retryCount 증가
 - 중복 eventId 저장 방지
+- `FAILED` / `DEAD` 이벤트 수동 재처리
+- Outbox 운영 API 요약, 목록, 상세 조회
 
 ### Async FDS 테스트
 
@@ -74,4 +77,3 @@
 - Case 상세 조회
 - 정탐 처리
 - 출금 `REJECTED` 처리
-

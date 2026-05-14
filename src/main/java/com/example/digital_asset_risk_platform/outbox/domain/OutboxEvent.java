@@ -1,16 +1,8 @@
 package com.example.digital_asset_risk_platform.outbox.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -87,8 +79,12 @@ public class OutboxEvent {
         this.updatedAt = LocalDateTime.now();
     }
 
-    ///========================================///
+    /// ========================================///
     public void markProcessing() {
+        if (this.status != OutboxEventStatus.PENDING && this.status != OutboxEventStatus.FAILED) {
+            throw new BusinessException(ErrorCode.INVALID_OUTBOX_EVENT_STATUS);
+        }
+
         this.status = OutboxEventStatus.PROCESSING;
         this.updatedAt = LocalDateTime.now();
     }
@@ -100,15 +96,34 @@ public class OutboxEvent {
         this.lastErrorMessage = null;
     }
 
+    //v1
     public void markFailed(String errorMessage) {
         this.status = OutboxEventStatus.FAILED;
         this.retryCount++;
         this.lastErrorMessage = trimErrorMessage(errorMessage);
         this.updatedAt = LocalDateTime.now();
     }
+    //v2
+    public void markFailed(String errorMessage, int maxRetryCount) {
+        this.retryCount++;
+        this.lastErrorMessage = trimErrorMessage(errorMessage);
+        this.updatedAt = LocalDateTime.now();
 
-    public void retry() {
+        if (this.retryCount >= maxRetryCount) {
+            this.status = OutboxEventStatus.DEAD;
+            return;
+        }
+
+        this.status = OutboxEventStatus.FAILED;
+    }
+
+    public void retryManually() {
+        if (this.status != OutboxEventStatus.FAILED && this.status != OutboxEventStatus.DEAD) {
+            throw new BusinessException(ErrorCode.INVALID_OUTBOX_EVENT_STATUS);
+        }
+
         this.status = OutboxEventStatus.PENDING;
+        this.lastErrorMessage = null;
         this.updatedAt = LocalDateTime.now();
     }
 

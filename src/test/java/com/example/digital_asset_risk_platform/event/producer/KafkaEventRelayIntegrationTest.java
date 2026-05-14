@@ -10,7 +10,6 @@ import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCreateReques
 import com.example.digital_asset_risk_platform.wallet.dto.WithdrawalCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
@@ -21,7 +20,6 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 
 @Deprecated
-@ActiveProfiles("test")
 public class KafkaEventRelayIntegrationTest extends IntegrationTestSupport {
 
     @Autowired

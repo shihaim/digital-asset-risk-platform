@@ -22,13 +22,7 @@ import com.example.digital_asset_risk_platform.outbox.domain.OutboxEvent;
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEventStatus;
 import com.example.digital_asset_risk_platform.outbox.repository.OutboxEventRepository;
 import com.example.digital_asset_risk_platform.risk.application.FdsWithdrawalEvaluationService;
-import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
-import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
-import com.example.digital_asset_risk_platform.risk.domain.RiskCaseType;
-import com.example.digital_asset_risk_platform.risk.domain.RiskDecisionType;
-import com.example.digital_asset_risk_platform.risk.domain.RiskEvaluation;
-import com.example.digital_asset_risk_platform.risk.domain.RiskLevel;
-import com.example.digital_asset_risk_platform.risk.domain.RiskRuleHit;
+import com.example.digital_asset_risk_platform.risk.domain.*;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
@@ -52,7 +46,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -63,7 +56,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest(properties = "fds.evaluation.mode=async")
-@ActiveProfiles("test")
 public class WithdrawalFdsE2ETest extends IntegrationTestSupport {
 
     @Autowired

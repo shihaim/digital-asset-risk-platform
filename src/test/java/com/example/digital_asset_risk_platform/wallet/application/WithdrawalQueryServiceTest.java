@@ -19,12 +19,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 
 @SpringBootTest(properties = "fds.evaluation.mode=async")
-@ActiveProfiles("test")
 public class WithdrawalQueryServiceTest extends IntegrationTestSupport {
 
     @Autowired

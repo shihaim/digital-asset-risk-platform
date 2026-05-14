@@ -10,13 +10,7 @@ import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
 import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
-import com.example.digital_asset_risk_platform.risk.domain.RiskCase;
-import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
-import com.example.digital_asset_risk_platform.risk.domain.RiskCaseType;
-import com.example.digital_asset_risk_platform.risk.domain.RiskDecisionType;
-import com.example.digital_asset_risk_platform.risk.domain.RiskEvaluation;
-import com.example.digital_asset_risk_platform.risk.domain.RiskLevel;
-import com.example.digital_asset_risk_platform.risk.domain.RiskRuleHit;
+import com.example.digital_asset_risk_platform.risk.domain.*;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
@@ -35,7 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
@@ -46,7 +39,6 @@ import java.util.Optional;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
-@ActiveProfiles("test")
 class WithdrawalServiceIntegrationTest extends IntegrationTestSupport {
 
     @Autowired

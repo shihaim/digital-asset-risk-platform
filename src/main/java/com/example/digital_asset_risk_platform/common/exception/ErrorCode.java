@@ -30,6 +30,7 @@ public enum ErrorCode {
     UNSUPPORTED_OUTBOX_EVENT_TYPE(HttpStatus.BAD_REQUEST, "OUTBOX_001", "지원하지 않는 Outbox 이벤트 타입입니다."),
     OUTBOX_EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "OUTBOX_002", "Outbox 이벤트를 찾을 수 없습니다."),
     OUTBOX_PUBLISH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "OUTBOX_003", "Outbox 이벤트 발행에 실패했습니다."),
+    INVALID_OUTBOX_EVENT_STATUS(HttpStatus.BAD_REQUEST, "OUTBOX_004", "현재 Outbox 이벤트 상태에서는 요청한 처리를 수행할 수 없습니다."),
 
     // Consumer
     DUPLICATE_EVENT(HttpStatus.CONFLICT, "EVENT_001", "이미 처리된 이벤트입니다."),

@@ -30,7 +30,8 @@ public class OutboxEventPublisher {
         List<OutboxEvent> events = outboxEventRepository.findByStatusInAndRetryCountLessThanOrderByCreatedAtAsc(
                 List.of(OutboxEventStatus.PENDING, OutboxEventStatus.FAILED),
                 MAX_RETRY_COUNT,
-                PageRequest.of(0, BATCH_SIZE));
+                PageRequest.of(0, BATCH_SIZE)
+        );
 
         log.info("Outbox publish batch started. size={}", events.size());
 
@@ -60,7 +61,7 @@ public class OutboxEventPublisher {
                         event.getRetryCount()
                 );
             } catch (Exception e) {
-                event.markFailed(e.getMessage());
+                event.markFailed(e.getMessage(), MAX_RETRY_COUNT);
 
                 log.error(
                         "Outbox event publish failed. eventId={}, eventType={}, topicName={}, status={}, retryCount={}, errorMessage={}",
