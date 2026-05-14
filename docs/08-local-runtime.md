@@ -1,6 +1,6 @@
-# Docker Compose 및 실행 환경 정리
+# Docker Compose 및 로컬 실행 환경
 
-이번 단계의 목표는 로컬에서 Docker Compose 기반 인프라를 띄우고, Spring Boot 애플리케이션을 실행해 API, Kafka, DB, Redis, Kafka UI를 확인할 수 있게 만드는 것입니다.
+이 문서는 Bash 기준으로 로컬 개발 환경을 실행하고, API/Kafka/DB/Redis/Kafka UI 동작을 확인하는 절차를 정리합니다.
 
 ```text
 git clone
@@ -9,14 +9,16 @@ cp .env.example .env
   |
 docker compose -f docker-compose.yaml up -d
   |
-SPRING_PROFILES_ACTIVE=local FDS_EVALUATION_MODE=async ./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local, FDS_EVALUATION_MODE=async
+  |
+./gradlew bootRun
   |
 API / Kafka / DB / Redis / Kafka UI 확인
 ```
 
 ---
 
-# 1. 최종 목표 구성
+# 1. 로컬 구성
 
 로컬 개발 환경은 아래 구성을 기준으로 합니다.
 
@@ -45,9 +47,9 @@ http://localhost:8080/actuator/health
 
 ---
 
-# 2. 프로젝트 파일 구조
+# 2. 파일 구조
 
-현재 프로젝트는 `.yaml` 확장자를 기준으로 정리합니다.
+현재 프로젝트는 `.yaml` 확장자를 기준으로 구성합니다.
 
 ```text
 digital-asset-risk-platform/
@@ -59,34 +61,26 @@ digital-asset-risk-platform/
   |   |- main/
   |   |   `- resources/
   |   |       |- application.yaml
-  |   |       `- application-local.yaml
+  |   |       |- application-local.yaml
+  |   |       |- application-dev.yaml
+  |   |       |- application-stage.yaml
+  |   |       `- application-prod.yaml
   |   `- test/
   |       `- resources/
   |           `- application-test.yaml
   `- build.gradle
 ```
 
-추후 환경이 늘어나면 아래 파일을 추가하는 구조가 적합합니다.
-
-```text
-src/main/resources/
-  |- application-dev.yaml
-  |- application-stage.yaml
-  `- application-prod.yaml
-```
-
 ---
 
-# 3. 환경 변수와 profile 전략
+# 3. Profile 및 환경 변수 전략
 
 중요한 기준은 다음과 같습니다.
 
 - `.env`는 Docker Compose가 읽는 환경 변수 파일입니다.
-- 현재 `application-local.yaml`은 `spring.config.import: optional:file:.env[.properties]`로 로컬 실행 시 `.env`를 읽도록 구성합니다.
-- Spring Boot 실행 환경은 `SPRING_PROFILES_ACTIVE`로 선택합니다.
-- local 외의 dev, stage, prod 환경에서는 `.env` 파일보다 배포 환경변수나 Secret Manager 주입을 기준으로 합니다.
-
-권장 profile 구조:
+- `application-local.yaml`은 `spring.config.import: optional:file:.env[.properties]`로 로컬 실행 시 `.env`를 읽습니다.
+- Spring Boot 실행 profile은 `SPRING_PROFILES_ACTIVE`로 선택합니다.
+- dev, stage, prod 환경은 `.env` 파일보다 배포 환경변수나 Secret Manager 주입을 기준으로 합니다.
 
 | Profile | 용도 | 설정 파일 |
 | --- | --- | --- |
@@ -96,7 +90,7 @@ src/main/resources/
 | prod | 운영 | `application-prod.yaml` |
 | test | 자동 테스트 | `src/test/resources/application-test.yaml` |
 
-`application.yaml`에서는 profile을 고정하지 않고 환경변수 기반으로 선택하는 편이 좋습니다.
+`application.yaml`은 profile 기본값을 `local`로 둡니다.
 
 ```yaml
 spring:
@@ -104,7 +98,7 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:local}
 ```
 
-로컬에서 async 모드로 실행하는 예:
+Bash에서 async 모드로 실행하는 예:
 
 ```bash
 SPRING_PROFILES_ACTIVE=local FDS_EVALUATION_MODE=async ./gradlew bootRun
@@ -149,8 +143,8 @@ cp .env.example .env
 주의할 점:
 
 - `.env`는 git에 커밋하지 않습니다.
-- 로컬 profile은 `application-local.yaml`의 config import를 통해 `.env` 값을 읽습니다.
-- dev, stage, prod는 `.env` 파일에 의존하지 않고 shell 환경변수, IDE Run Configuration, 배포 환경 변수 중 하나로 주입합니다.
+- local profile은 `application-local.yaml`의 config import를 통해 `.env` 값을 읽습니다.
+- dev, stage, prod는 `.env` 파일에 의존하지 않고 실행 환경의 환경변수로 값을 주입합니다.
 
 ---
 
@@ -184,7 +178,7 @@ Kafka listener 기준:
 Docker 내부 Kafka UI -> kafka:29092
 ```
 
-따라서 Kafka는 외부 접속용 listener와 Docker network 내부 접속용 listener를 함께 가져야 합니다.
+Kafka는 외부 접속용 listener와 Docker network 내부 접속용 listener를 함께 사용합니다.
 
 ---
 
@@ -192,9 +186,9 @@ Docker 내부 Kafka UI -> kafka:29092
 
 ## 6.1 `application.yaml`
 
-공통 설정은 `application.yaml`에 둡니다.
+공통 설정은 `application.yaml`에 둡니다. 환경별 DB 계정, Kafka 주소, Redis 주소는 공통 파일에 직접 고정하지 않습니다.
 
-권장 방향:
+핵심 설정:
 
 ```yaml
 spring:
@@ -214,18 +208,7 @@ fds:
 outbox:
   publisher:
     fixed-delay-ms: ${OUTBOX_PUBLISHER_FIXED_DELAY_MS:3000}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
 ```
-
-공통 파일에는 환경별 DB 계정, Kafka 주소, Redis 주소를 직접 고정하지 않는 것이 좋습니다.
 
 ## 6.2 `application-local.yaml`
 
@@ -236,101 +219,34 @@ management:
 - DB host: `localhost`
 - Kafka bootstrap server: `localhost:9092`
 - Redis host: `localhost`
-- JPA ddl-auto: 로컬에서는 `update` 허용 가능
-- Kafka payload: 현재 구조는 Outbox의 raw JSON 문자열 발행 흐름을 기준으로 `StringDeserializer` / `JsonSerializer` 조합을 사용합니다.
+- JPA ddl-auto: 로컬에서는 `update`
+- Kafka listener: local profile에서는 자동 시작
 
-```yaml
-spring:
-  config:
-    import: optional:file:.env[.properties]
+Kafka 직렬화/역직렬화 구조는 두 흐름으로 나뉩니다.
 
-  datasource:
-    url: jdbc:mariadb://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:risk_platform}
-    username: ${MYSQL_USERNAME:${MYSQL_USER:risk_user}}
-    password: ${MYSQL_PASSWORD:risk_password}
-    driver-class-name: org.mariadb.jdbc.Driver
+| 흐름 | Producer | Consumer |
+| --- | --- | --- |
+| 일반 이벤트 직접 발행 | `KafkaTemplate<String, Object>` + `JsonSerializer` | Listener factory에서 타입별 `JsonDeserializer<T>` 주입 |
+| Outbox 재발행 | `KafkaTemplate<String, String>` + `StringSerializer` | Listener factory에서 payload JSON을 타입별 DTO로 역직렬화 |
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MariaDBDialect
-        jdbc:
-          time_zone: Asia/Seoul
-    open-in-view: false
-
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-
-    producer:
-      acks: all
-      retries: 3
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false
-
-    consumer:
-      group-id: ${KAFKA_CONSUMER_GROUP_ID:risk-platform-local}
-      auto-offset-reset: earliest
-      enable-auto-commit: false
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
-    listener:
-      ack-mode: manual
-      auto-startup: true
-
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-```
+`application-local.yaml`의 `value-deserializer` 기본값은 `StringDeserializer`이지만, 실제 `@KafkaListener`는 `KafkaConsumerConfig`의 타입별 container factory가 `JsonDeserializer<T>`를 명시적으로 주입합니다.
 
 ## 6.3 `application-dev.yaml`, `application-stage.yaml`, `application-prod.yaml`
 
 dev, stage, prod는 로컬 기본값보다 환경변수 주입을 우선합니다.
 
-예시:
-
-```yaml
-spring:
-  datasource:
-    url: ${MYSQL_URL:jdbc:mariadb://${MYSQL_HOST}:${MYSQL_PORT:3306}/${MYSQL_DATABASE}}
-    username: ${MYSQL_USERNAME:${MYSQL_USER}}
-    password: ${MYSQL_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    open-in-view: false
-
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT:6379}
-```
-
-운영 계열 환경에서는 다음 원칙을 권장합니다.
+운영 계열 환경 원칙:
 
 - `ddl-auto: update` 사용 금지
 - `ddl-auto: validate` 또는 migration 도구 사용
 - DB password, Kafka 주소, Redis 주소는 환경변수 또는 Secret Manager로 주입
-- DEBUG SQL logging 비활성화
+- 운영에서는 DEBUG SQL logging 비활성화
 
 ## 6.4 `application-test.yaml`
 
 테스트 설정은 로컬 Docker Compose와 분리합니다.
 
-현재 테스트는 Testcontainers 기반으로 구성되어 있으므로, `./gradlew test`를 실행하기 전에 `docker compose up`을 할 필요는 없습니다.
-
-다만 Testcontainers가 컨테이너를 띄우기 때문에 Docker 실행 환경은 필요합니다.
+현재 테스트는 Testcontainers 기반이므로 `.\gradlew.bat test`를 실행하기 전에 `docker compose up`을 할 필요는 없습니다. 다만 Testcontainers가 컨테이너를 띄우기 때문에 Docker Desktop 실행 환경은 필요합니다.
 
 테스트에서는 Kafka listener를 기본적으로 꺼두고, Kafka E2E 테스트에서만 override하는 방식이 안정적입니다.
 
@@ -432,10 +348,18 @@ Topic은 Spring Boot 애플리케이션이 실행된 뒤 생성되거나, 이벤
 
 async 모드에서는 출금 요청 직후 `EVALUATING` 응답이 오고, Kafka Consumer가 이벤트를 처리한 뒤 상태가 변경됩니다. 따라서 출금 요청 후 바로 한 번만 조회하지 말고 잠시 뒤 재조회합니다.
 
+계정 이벤트 기반 Rule은 시간 조건을 사용합니다. 아래 예시는 실행 시점 기준으로 최근 로그인/보안 이벤트 시간을 동적으로 생성합니다.
+
+```bash
+BASE_URL="http://localhost:8080"
+LOGIN_AT="$(date -d '30 minutes ago' '+%Y-%m-%dT%H:%M:%S')"
+SECURITY_AT="$(date -d '20 minutes ago' '+%Y-%m-%dT%H:%M:%S')"
+```
+
 ## 8.1 고위험 지갑 등록
 
 ```bash
-curl -X POST http://localhost:8080/api/wallet-risks \
+curl -X POST "$BASE_URL/api/wallet-risks" \
   -H "Content-Type: application/json" \
   -d '{
     "chainType": "TRON",
@@ -450,36 +374,36 @@ curl -X POST http://localhost:8080/api/wallet-risks \
 ## 8.2 계정 로그인 이벤트 생성
 
 ```bash
-curl -X POST http://localhost:8080/api/account-events/logins \
+curl -X POST "$BASE_URL/api/account-events/logins" \
   -H "Content-Type: application/json" \
-  -d '{
-    "userId": 10001,
-    "deviceId": "device-new-001",
-    "ipAddress": "203.0.113.10",
-    "countryCode": "KR",
-    "userAgent": "Mozilla/5.0",
-    "loginAt": "2026-05-09T09:30:00"
-  }'
+  -d "{
+    \"userId\": 10001,
+    \"deviceId\": \"device-new-001\",
+    \"ipAddress\": \"203.0.113.10\",
+    \"countryCode\": \"KR\",
+    \"userAgent\": \"Mozilla/5.0\",
+    \"loginAt\": \"$LOGIN_AT\"
+  }"
 ```
 
 ## 8.3 계정 보안 이벤트 생성
 
 ```bash
-curl -X POST http://localhost:8080/api/account-events/security \
+curl -X POST "$BASE_URL/api/account-events/security" \
   -H "Content-Type: application/json" \
-  -d '{
-    "userId": 10001,
-    "eventType": "OTP_RESET",
-    "deviceId": "device-new-001",
-    "ipAddress": "203.0.113.10",
-    "eventAt": "2026-05-09T09:40:00"
-  }'
+  -d "{
+    \"userId\": 10001,
+    \"eventType\": \"OTP_RESET\",
+    \"deviceId\": \"device-new-001\",
+    \"ipAddress\": \"203.0.113.10\",
+    \"eventAt\": \"$SECURITY_AT\"
+  }"
 ```
 
 ## 8.4 출금 요청
 
 ```bash
-curl -X POST http://localhost:8080/api/withdrawals \
+curl -X POST "$BASE_URL/api/withdrawals" \
   -H "Content-Type: application/json" \
   -d '{
     "userId": 10001,
@@ -506,27 +430,28 @@ async 모드 응답 예:
 ## 8.5 출금 상세 재조회
 
 ```bash
-curl http://localhost:8080/api/withdrawals/1
+sleep 3
+curl "$BASE_URL/api/withdrawals/1"
 ```
 
-async 모드에서는 Consumer 처리 시간이 필요할 수 있으므로 잠시 후 다시 조회합니다.
+async 모드에서는 Consumer 처리 시간이 필요할 수 있으므로 상태가 아직 `EVALUATING`이면 잠시 후 다시 조회합니다.
 
 ## 8.6 관리자 Case 목록 조회
 
 ```bash
-curl http://localhost:8080/api/admin/risk-cases
+curl "$BASE_URL/api/admin/risk-cases"
 ```
 
 ## 8.7 관리자 대시보드 요약 조회
 
 ```bash
-curl http://localhost:8080/api/admin/risk-dashboard/summary
+curl "$BASE_URL/api/admin/risk-dashboard/summary"
 ```
 
 ## 8.8 사용자 리스크 타임라인 조회
 
 ```bash
-curl http://localhost:8080/api/admin/users/10001/risk-timeline
+curl "$BASE_URL/api/admin/users/10001/risk-timeline"
 ```
 
 ---
@@ -644,125 +569,10 @@ docker compose -f docker-compose.yaml logs -f kafka-ui
 
 ## `.env`를 수정했는데 Spring Boot 설정이 바뀌지 않는 경우
 
-현재 local profile은 `application-local.yaml`의 `spring.config.import` 설정으로 `.env`를 읽을 수 있습니다.
+local profile은 `application-local.yaml`의 `spring.config.import` 설정으로 `.env`를 읽을 수 있습니다.
 
-다만 이 방식은 로컬 실행 편의용입니다. dev, stage, prod에서는 Spring Boot 실행 시 환경변수를 직접 주입합니다.
+다만 `.env` 수정 후 이미 실행 중인 Spring Boot 애플리케이션에는 자동 반영되지 않습니다. 애플리케이션을 재시작해야 합니다.
 
 ```bash
 SPRING_PROFILES_ACTIVE=local FDS_EVALUATION_MODE=async ./gradlew bootRun
-```
-
----
-
-# 12. README에 넣을 실행 환경 섹션
-
-아래 내용을 README에 요약 섹션으로 추가할 수 있습니다.
-
-````markdown
-## 로컬 실행 환경
-
-본 프로젝트는 로컬 개발 편의를 위해 Docker Compose 기반 인프라 환경을 제공합니다.
-
-### 구성 요소
-
-| Service | Port | Description |
-|---|---:|---|
-| MariaDB | 3306 | 메인 데이터베이스 |
-| Kafka | 9092 | 이벤트 브로커 |
-| Kafka UI | 8085 | Kafka Topic/Message 확인 |
-| Redis | 6379 | 캐시 |
-| Spring Boot | 8080 | API 서버 |
-
-### 실행
-
-```bash
-cp .env.example .env
-docker compose -f docker-compose.yaml up -d
-SPRING_PROFILES_ACTIVE=local FDS_EVALUATION_MODE=async ./gradlew bootRun
-```
-
-### Health Check
-
-```bash
-curl http://localhost:8080/actuator/health
-```
-
-### Kafka UI
-
-```text
-http://localhost:8085
-```
-
-### 종료
-
-```bash
-docker compose -f docker-compose.yaml down
-```
-
-볼륨까지 삭제하려면:
-
-```bash
-docker compose -f docker-compose.yaml down -v
-```
-
-`down -v`는 로컬 DB/Kafka/Redis 데이터를 삭제합니다.
-````
-
----
-
-# 13. 문서 링크 추가
-
-`README.md` 또는 `docs/00-overview.md`에 아래 내용을 추가할 수 있습니다.
-
-```markdown
-## 실행 환경
-
-- MariaDB, Kafka, Redis는 Docker Compose로 실행합니다.
-- Kafka UI를 통해 `withdrawal.requested`, `risk.evaluation.completed`, `risk.case.created` topic을 확인할 수 있습니다.
-- 자세한 실행 방법은 `docs/08-local-runtime.md`를 참고합니다.
-```
-
----
-
-# 14. 완료 기준
-
-이번 작업은 아래가 확인되면 완료입니다.
-
-```text
-[ ] docker-compose.yaml 구성 확인
-[ ] .env.example 구성 확인
-[ ] application.yaml 공통 설정 정리
-[ ] application-local.yaml 로컬 실행 설정 정리
-[ ] application-test.yaml 테스트 설정 정리
-[ ] dev/stage/prod profile 확장 방향 정리
-[ ] MariaDB 컨테이너 정상 실행
-[ ] Kafka 컨테이너 정상 실행
-[ ] Kafka UI 접속 가능
-[ ] Redis 컨테이너 정상 실행
-[ ] Spring Boot가 local profile로 정상 실행
-[ ] /actuator/health 정상 응답
-[ ] 로컬 API 시나리오 정상 동작
-[ ] async 모드에서 요청 후 Consumer 처리 결과 재조회 가능
-[ ] Kafka UI에서 topic/message 확인 가능
-[ ] README에 실행 방법 요약 추가
-```
-
----
-
-# 15. 커밋 메시지
-
-```bash
-chore: Docker Compose 기반 로컬 실행 환경 정리
-```
-
-본문 포함:
-
-```text
-chore: Docker Compose 기반 로컬 실행 환경 정리
-
-- Docker Compose 기반 MariaDB, Kafka, Kafka UI, Redis 실행 방법 문서화
-- local/test profile 설정 기준 정리
-- dev/stage/prod profile 확장 방향 추가
-- Kafka UI 및 Actuator 기반 실행 확인 방법 정리
-- async 모드 로컬 검증 시나리오 추가
 ```

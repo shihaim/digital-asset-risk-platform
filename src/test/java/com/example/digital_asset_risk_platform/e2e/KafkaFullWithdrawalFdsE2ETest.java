@@ -205,7 +205,8 @@ public class KafkaFullWithdrawalFdsE2ETest extends KafkaIntegrationTestSupport {
 
                     assertThat(statistics.getHitCount()).isOne();
 
-                    // TODO: expected 3, but was 4 발생
+                    // [??] expected 3, but was 4 발생
+                    // [2026-05-14] 전체 테스트시 expected 3, but was 2 발생
                     assertThat(auditEventLogRepository.count()).isEqualTo(3);
 
                     assertThat(outboxEventRepository.findAll())
