@@ -70,4 +70,13 @@ public class AdminNotification {
         this.readYn = "N";
         this.createdAt = LocalDateTime.now();
     }
+
+    public void markAsRead() {
+        if ("Y".equals(this.readYn)) {
+            return;
+        }
+
+        this.readYn = "Y";
+        this.readAt = LocalDateTime.now();
+    }
 }

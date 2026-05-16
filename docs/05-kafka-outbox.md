@@ -8,6 +8,15 @@
 | `risk.evaluation.completed` | `RiskEvaluationCompletedEvent` | FDS 평가 완료 |
 | `risk.case.created` | `RiskCaseCreatedEvent` | RiskCase 생성 |
 
+## 1.1 Consumer 후속 처리
+
+| Consumer | Topic | 주요 처리 |
+| --- | --- | --- |
+| `FdsWithdrawalConsumer` | `withdrawal.requested` | 비동기 FDS 평가 수행 |
+| `AuditEventConsumer` | 전체 주요 Topic | 이벤트 감사 로그 저장 |
+| `AdminNotificationConsumer` | `risk.case.created` | 관리자 알림 저장 |
+| `RiskRuleStatisticsConsumer` | `risk.evaluation.completed` | Rule 적중 통계 증가 |
+
 ## 2. 이벤트 발행 구조
 
 ```mermaid

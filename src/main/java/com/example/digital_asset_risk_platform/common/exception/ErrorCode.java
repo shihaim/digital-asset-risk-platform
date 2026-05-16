@@ -26,6 +26,9 @@ public enum ErrorCode {
     WALLET_RISK_NOT_FOUND(HttpStatus.NOT_FOUND, "WALLET_RISK_001", "지갑 위험도 정보를 찾을 수 없습니다."),
     DUPLICATE_WALLET_RISK(HttpStatus.CONFLICT, "WALLET_RISK_002", "이미 등록된 지갑 위험도 정보입니다."),
 
+    // Admin
+    ADMIN_NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "ADMIN_NOTIFICATION_001", "관리자 알림을 찾을 수 없습니다."),
+
     // Event / Outbox
     UNSUPPORTED_OUTBOX_EVENT_TYPE(HttpStatus.BAD_REQUEST, "OUTBOX_001", "지원하지 않는 Outbox 이벤트 타입입니다."),
     OUTBOX_EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "OUTBOX_002", "Outbox 이벤트를 찾을 수 없습니다."),
