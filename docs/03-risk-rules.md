@@ -4,6 +4,8 @@
 
 출금 요청이 생성되면 `RiskContext`를 구성하고, 각 Rule이 해당 출금의 위험 신호를 평가합니다.
 
+Rule 적중 결과는 `risk.evaluation.completed` 이벤트의 `ruleCodes`로 전달되며, `risk_rule_statistics`에 집계됩니다. 관리자는 Rule 통계 API를 통해 어떤 Rule이 자주 적중하는지 확인할 수 있습니다.
+
 각 Rule은 다음 정보를 반환합니다.
 
 | 필드 | 설명 |
@@ -96,4 +98,3 @@
 | 80~119 | `HIGH` | `HOLD_WITHDRAWAL` | `HELD` |
 | 120 이상 | `CRITICAL` | `HOLD_WITHDRAWAL` | `HELD` |
 | `blocking=true` | `CRITICAL` | `BLOCK_WITHDRAWAL` | `BLOCKED` |
-

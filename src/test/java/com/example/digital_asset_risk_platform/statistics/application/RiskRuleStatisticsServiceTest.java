@@ -1,15 +1,19 @@
 package com.example.digital_asset_risk_platform.statistics.application;
 
 import com.example.digital_asset_risk_platform.statistics.domain.RiskRuleStatistics;
+import com.example.digital_asset_risk_platform.statistics.dto.RiskRuleStatisticsResponse;
 import com.example.digital_asset_risk_platform.statistics.repository.RiskRuleStatisticsRepository;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RiskRuleStatisticsServiceTest extends IntegrationTestSupport {
 
@@ -36,8 +40,8 @@ class RiskRuleStatisticsServiceTest extends IntegrationTestSupport {
         //then
         RiskRuleStatistics statistics = riskRuleStatisticsRepository.findByRuleCode(ruleCode).orElseThrow();
 
-        Assertions.assertThat(statistics.getRuleCode()).isEqualTo(ruleCode);
-        Assertions.assertThat(statistics.getHitCount()).isEqualTo(1L);
+        assertThat(statistics.getRuleCode()).isEqualTo(ruleCode);
+        assertThat(statistics.getHitCount()).isEqualTo(1L);
     }
 
     @Test
@@ -53,6 +57,28 @@ class RiskRuleStatisticsServiceTest extends IntegrationTestSupport {
         //then
         RiskRuleStatistics statistics = riskRuleStatisticsRepository.findByRuleCode(ruleCode).orElseThrow();
 
-        Assertions.assertThat(statistics.getHitCount()).isEqualTo(2L);
+        assertThat(statistics.getHitCount()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("Rule 통계를 hitCount 내림차순으로 조회한다")
+    void case3() {
+        //given
+        LocalDateTime now = LocalDateTime.now();
+
+        riskRuleStatisticsService.increaseRuleHit("OTP_RESET_WITHDRAWAL", now.minusMinutes(10));
+        riskRuleStatisticsService.increaseRuleHit("HIGH_RISK_WALLET", now.minusMinutes(5));
+        riskRuleStatisticsService.increaseRuleHit("HIGH_RISK_WALLET", now.minusMinutes(1));
+
+        //when
+        Page<RiskRuleStatisticsResponse> result = riskRuleStatisticsService.getStatistics(PageRequest.of(0, 10));
+
+        //then
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent())
+                .extracting(RiskRuleStatisticsResponse::ruleCode)
+                .containsExactly("HIGH_RISK_WALLET", "OTP_RESET_WITHDRAWAL");
+        assertThat(result.getContent().get(0).hitCount()).isEqualTo(2L);
+        assertThat(result.getContent().get(1).hitCount()).isEqualTo(1L);
     }
 }

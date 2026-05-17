@@ -69,6 +69,14 @@
 - 이미 읽은 알림 재요청 시 멱등 처리
 - 존재하지 않는 알림 읽음 처리 시 예외 응답
 
+### Rule 통계 API 테스트
+
+- Rule 통계 목록 조회
+- `hitCount` 내림차순 정렬 검증
+- `lastHitAt` 내림차순 보조 정렬 검증
+- 상위 Rule 통계 조회
+- `limit` 최소/최대 보정 검증
+
 ### Async FDS 테스트
 
 - async 모드 `EVALUATING` 응답

@@ -260,11 +260,100 @@ GET /api/admin/notifications?readYn=N&page=0&size=20
 
 존재하지 않는 `notificationId`이면 `ADMIN_NOTIFICATION_NOT_FOUND` 예외가 발생합니다.
 
-## 7. Supporting APIs
+## 7. Rule 통계 API
+
+Rule 통계는 `risk.evaluation.completed` 이벤트를 `RiskRuleStatisticsConsumer`가 소비하면서 집계됩니다.
+
+```text
+risk.evaluation.completed 이벤트 발생
+  -> RiskRuleStatisticsConsumer 소비
+  -> ruleCodes 기준 risk_rule_statistics 적재/증가
+  -> 관리자 Rule 통계 API에서 조회
+```
+
+통계 목록은 `hitCount` 내림차순, `lastHitAt` 내림차순으로 정렬됩니다.
+
+### 7.1 Rule 통계 목록 조회
+
+### `GET /api/admin/risk-rule-statistics`
+
+FDS Rule 적중 통계를 조회합니다.
+
+### Query Parameters
+
+| Name | Required | Description |
+| --- | --- | --- |
+| `page` | false | page number |
+| `size` | false | page size |
+
+### Request Example
+
+```http
+GET /api/admin/risk-rule-statistics?page=0&size=20
+```
+
+### Response
+
+```json
+{
+  "content": [
+    {
+      "ruleCode": "HIGH_RISK_WALLET",
+      "hitCount": 12,
+      "lastHitAt": "2026-05-12T10:00:00",
+      "createdAt": "2026-05-10T09:00:00",
+      "updatedAt": "2026-05-12T10:00:00"
+    },
+    {
+      "ruleCode": "OTP_RESET_WITHDRAWAL",
+      "hitCount": 7,
+      "lastHitAt": "2026-05-12T09:30:00",
+      "createdAt": "2026-05-10T09:10:00",
+      "updatedAt": "2026-05-12T09:30:00"
+    }
+  ],
+  "totalElements": 2,
+  "totalPages": 1
+}
+```
+
+### 7.2 상위 Rule 통계 조회
+
+### `GET /api/admin/risk-rule-statistics/top?limit=5`
+
+적중 횟수 기준 상위 Rule을 조회합니다. `limit`은 1~50 사이로 보정됩니다.
+
+### Query Parameters
+
+| Name | Required | Default | Description |
+| --- | --- | ---: | --- |
+| `limit` | false | 5 | 조회할 상위 Rule 개수 |
+
+### Response
+
+응답 구조는 Rule 통계 목록 조회와 동일한 Page 구조입니다.
+
+```json
+{
+  "content": [
+    {
+      "ruleCode": "HIGH_RISK_WALLET",
+      "hitCount": 12,
+      "lastHitAt": "2026-05-12T10:00:00",
+      "createdAt": "2026-05-10T09:00:00",
+      "updatedAt": "2026-05-12T10:00:00"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1
+}
+```
+
+## 8. Supporting APIs
 
 아래 API는 FDS 평가와 관리자 심사를 보조하는 운영/테스트용 API입니다. 핵심 흐름은 출금 요청과 RiskCase API가 담당하고, Supporting APIs는 위험 신호 데이터 생성, 위험 지갑 등록, 대시보드 요약, 사용자 타임라인 조회를 담당합니다.
 
-### 7.1 계정 로그인 이벤트 생성
+### 8.1 계정 로그인 이벤트 생성
 
 ### `POST /api/account-events/logins`
 
@@ -289,7 +378,7 @@ GET /api/admin/notifications?readYn=N&page=0&size=20
 1
 ```
 
-### 7.2 계정 보안 이벤트 생성
+### 8.2 계정 보안 이벤트 생성
 
 ### `POST /api/account-events/security`
 
@@ -315,7 +404,7 @@ OTP 재설정, 비밀번호 변경 등 출금 위험 평가에 사용할 보안 
 1
 ```
 
-### 7.3 위험 지갑 등록
+### 8.3 위험 지갑 등록
 
 ### `POST /api/wallet-risks`
 
@@ -340,7 +429,7 @@ OTP 재설정, 비밀번호 변경 등 출금 위험 평가에 사용할 보안 
 1
 ```
 
-### 7.4 관리자 리스크 대시보드 요약
+### 8.4 관리자 리스크 대시보드 요약
 
 ### `GET /api/admin/risk-dashboard/summary`
 
@@ -361,7 +450,7 @@ OTP 재설정, 비밀번호 변경 등 출금 위험 평가에 사용할 보안 
 }
 ```
 
-### 7.5 사용자 리스크 타임라인 조회
+### 8.5 사용자 리스크 타임라인 조회
 
 ### `GET /api/admin/users/{userId}/risk-timeline`
 
