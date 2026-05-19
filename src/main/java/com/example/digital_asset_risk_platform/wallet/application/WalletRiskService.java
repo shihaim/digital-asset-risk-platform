@@ -1,11 +1,13 @@
 package com.example.digital_asset_risk_platform.wallet.application;
 
+import com.example.digital_asset_risk_platform.common.cache.CacheNames;
 import com.example.digital_asset_risk_platform.risk.application.WalletRiskSnapshot;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletAddressRisk;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCreateRequest;
 import com.example.digital_asset_risk_platform.wallet.repository.WalletAddressRiskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,10 @@ public class WalletRiskService {
 
     private final WalletAddressRiskRepository walletAddressRiskRepository;
 
+    @CacheEvict(
+            cacheNames = CacheNames.WALLET_RISK,
+            key = "#request.chainType() + ':' + #request.address()"
+    )
     public Long createWalletRisk(WalletRiskCreateRequest request) {
         WalletAddressRisk risk = new WalletAddressRisk(
                 request.chainType(),

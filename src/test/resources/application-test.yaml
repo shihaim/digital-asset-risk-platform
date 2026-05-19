@@ -11,6 +11,9 @@ spring:
     listener:
       auto-startup: false
 
+  cache:
+    type: simple
+
 fds:
   evaluation:
     mode: sync

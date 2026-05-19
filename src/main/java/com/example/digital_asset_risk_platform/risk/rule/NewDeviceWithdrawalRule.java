@@ -7,6 +7,7 @@ import java.util.Optional;
 
 @Component
 public class NewDeviceWithdrawalRule implements RiskRule {
+
     @Override
     public Optional<RuleHit> evaluate(RiskContext context) {
         if (!context.accountRisk().newDeviceLoginWithin1h()) {
