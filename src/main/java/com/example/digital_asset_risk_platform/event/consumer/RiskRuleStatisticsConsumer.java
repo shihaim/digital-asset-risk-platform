@@ -22,7 +22,7 @@ public class RiskRuleStatisticsConsumer {
 
     @KafkaListener(
             topics = KafkaTopicConfig.RISK_EVALUATION_COMPLETED,
-            groupId = CONSUMER_NAME,
+            groupId = "${app.kafka.consumer.group.rule-statistics:rule-statistics-consumer}",
             containerFactory = "riskEvaluationCompletedKafkaListenerContainerFactory"
     )
     public void consume(RiskEvaluationCompletedEvent event, Acknowledgment acknowledgment) {

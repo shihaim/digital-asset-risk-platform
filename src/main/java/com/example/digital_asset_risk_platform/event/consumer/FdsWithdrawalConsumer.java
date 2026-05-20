@@ -20,7 +20,7 @@ public class FdsWithdrawalConsumer {
 
     @KafkaListener(
             topics = KafkaTopicConfig.WITHDRAWAL_REQUESTED,
-            groupId = "fds-withdrawal-consumer",
+            groupId = "${app.kafka.consumer.group.fds-withdrawal:fds-withdrawal-consumer}",
             containerFactory = "withdrawalRequestedKafkaListenerContainerFactory"
     )
     public void consume(WithdrawalRequestedEvent event, Acknowledgment acknowledgment) {

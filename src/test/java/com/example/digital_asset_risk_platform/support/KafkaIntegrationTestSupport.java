@@ -9,7 +9,11 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestPropertySource(properties = {
         "spring.kafka.listener.auto-startup=true",
-        "fds.evaluation.mode=async"})
+        "fds.evaluation.mode=async",
+        "app.kafka.consumer.group.fds-withdrawal=fds-withdrawal-consumer-${random.uuid}",
+        "app.kafka.consumer.group.audit-log=audit-log-consumer-${random.uuid}",
+        "app.kafka.consumer.group.admin-notification=admin-notification-consumer-${random.uuid}",
+        "app.kafka.consumer.group.rule-statistics=rule-statistics-consumer-${random.uuid}"})
 @Testcontainers
 public abstract class KafkaIntegrationTestSupport extends IntegrationTestSupport {
 
