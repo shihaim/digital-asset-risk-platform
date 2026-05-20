@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Component
 public class HighAmountWithdrawalRule implements RiskRule {
+
     @Override
     public Optional<RuleHit> evaluate(RiskContext context) {
         BigDecimal average = context.averageWithdrawalAmount();

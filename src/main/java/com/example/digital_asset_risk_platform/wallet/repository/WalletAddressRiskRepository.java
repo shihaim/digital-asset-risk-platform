@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface WalletAddressRiskRepository extends JpaRepository<WalletAddressRisk, Long> {
     Optional<WalletAddressRisk> findByChainTypeAndAddress(String chainType, String address);
+
+    boolean existsByChainTypeAndAddress(String chainType, String address);
 }

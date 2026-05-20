@@ -1,16 +1,15 @@
 package com.example.digital_asset_risk_platform.support;
 
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@SpringBootTest(properties = {
+@TestPropertySource(properties = {
         "spring.kafka.listener.auto-startup=true",
-        "fds.evaluation.mode=async"
-})
+        "fds.evaluation.mode=async"})
 @Testcontainers
 public abstract class KafkaIntegrationTestSupport extends IntegrationTestSupport {
 
