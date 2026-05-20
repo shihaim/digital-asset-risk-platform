@@ -1,5 +1,6 @@
 package com.example.digital_asset_risk_platform.kyt.dto;
 
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 
 public record KytLookupResult(
@@ -7,7 +8,7 @@ public record KytLookupResult(
         String address,
         WalletRiskLevel riskLevel,
         Integer riskScore,
-        String riskCategory,
+        KytRiskCategory riskCategory,
         String provider,
         boolean risky
 ) {
@@ -21,7 +22,7 @@ public record KytLookupResult(
                 address,
                 WalletRiskLevel.LOW,
                 0,
-                "NORMAL",
+                KytRiskCategory.NORMAL,
                 provider,
                 false
         );
@@ -32,7 +33,7 @@ public record KytLookupResult(
             String address,
             WalletRiskLevel riskLevel,
             Integer riskScore,
-            String riskCategory,
+            KytRiskCategory riskCategory,
             String provider
     ) {
         return new KytLookupResult(

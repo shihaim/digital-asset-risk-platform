@@ -410,6 +410,10 @@ OTP 재설정, 비밀번호 변경 등 출금 위험 평가에 사용할 보안 
 
 고위험 지갑 주소 정보를 등록합니다. 등록된 주소는 `HIGH_RISK_WALLET` Rule 평가에 사용됩니다.
 
+DB에 등록되지 않은 주소는 출금 FDS 평가 중 KYT Provider Mock fallback으로 조회될 수 있습니다. Mock Provider가 위험 주소로 판단한 경우 내부 `wallet_address_risk`에 동기화됩니다.
+
+`riskCategory`는 `KytRiskCategory` enum 값입니다. 사용 가능한 값은 `UNKNOWN_ADDRESS`, `NORMAL`, `HACKED_FUNDS`, `PHISHING`, `SANCTIONED_ADDRESS`, `MIXER`, `DARKNET_MARKET`, `SCAM`, `HIGH_RISK_EXCHANGE`입니다.
+
 ### Request
 
 ```json
@@ -418,7 +422,7 @@ OTP 재설정, 비밀번호 변경 등 출금 위험 평가에 사용할 보안 
   "address": "THACKED000001",
   "riskLevel": "CRITICAL",
   "riskScore": 100,
-  "riskCategory": "SANCTIONED_WALLET",
+  "riskCategory": "SANCTIONED_ADDRESS",
   "provider": "INTERNAL"
 }
 ```

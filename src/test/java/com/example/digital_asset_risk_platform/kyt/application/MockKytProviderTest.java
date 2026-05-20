@@ -2,6 +2,7 @@ package com.example.digital_asset_risk_platform.kyt.application;
 
 import com.example.digital_asset_risk_platform.kyt.dto.KytLookupRequest;
 import com.example.digital_asset_risk_platform.kyt.dto.KytLookupResult;
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class MockKytProviderTest {
         assertThat(result.risky()).isTrue();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
         assertThat(result.riskScore()).isEqualTo(100);
-        assertThat(result.riskCategory()).isEqualTo("HACKED_FUNDS");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.HACKED_FUNDS);
         assertThat(result.provider()).isEqualTo("MOCK_KYT");
     }
 
@@ -42,7 +43,7 @@ class MockKytProviderTest {
         assertThat(result.risky()).isTrue();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.CRITICAL);
         assertThat(result.riskScore()).isEqualTo(100);
-        assertThat(result.riskCategory()).isEqualTo("SANCTIONED_ADDRESS");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.SANCTIONED_ADDRESS);
         assertThat(result.provider()).isEqualTo("MOCK_KYT");
     }
 
@@ -59,7 +60,7 @@ class MockKytProviderTest {
         assertThat(result.risky()).isTrue();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
         assertThat(result.riskScore()).isEqualTo(90);
-        assertThat(result.riskCategory()).isEqualTo("MIXER");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.MIXER);
         assertThat(result.provider()).isEqualTo("MOCK_KYT");
     }
 
@@ -76,7 +77,7 @@ class MockKytProviderTest {
         assertThat(result.risky()).isTrue();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
         assertThat(result.riskScore()).isEqualTo(85);
-        assertThat(result.riskCategory()).isEqualTo("PHISHING");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.PHISHING);
         assertThat(result.provider()).isEqualTo("MOCK_KYT");
     }
 
@@ -93,7 +94,7 @@ class MockKytProviderTest {
         assertThat(result.risky()).isFalse();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.LOW);
         assertThat(result.riskScore()).isZero();
-        assertThat(result.riskCategory()).isEqualTo("NORMAL");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.NORMAL);
         assertThat(result.provider()).isEqualTo("MOCK_KYT");
     }
 
@@ -109,7 +110,7 @@ class MockKytProviderTest {
         // then
         assertThat(result.risky()).isTrue();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
-        assertThat(result.riskCategory()).isEqualTo("HACKED_FUNDS");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.HACKED_FUNDS);
     }
 
     @Test
@@ -124,6 +125,6 @@ class MockKytProviderTest {
         // then
         assertThat(result.risky()).isFalse();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.LOW);
-        assertThat(result.riskCategory()).isEqualTo("NORMAL");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.NORMAL);
     }
 }

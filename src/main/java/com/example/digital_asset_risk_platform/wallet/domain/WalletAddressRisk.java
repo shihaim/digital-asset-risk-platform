@@ -1,5 +1,6 @@
 package com.example.digital_asset_risk_platform.wallet.domain;
 
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,8 +39,9 @@ public class WalletAddressRisk {
     @Column(name = "risk_score", nullable = false)
     private int riskScore;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "risk_category", length = 100)
-    private String riskCategory;
+    private KytRiskCategory riskCategory;
 
     @Column(name = "provider", length = 50)
     private String provider;
@@ -55,7 +57,7 @@ public class WalletAddressRisk {
             String address,
             WalletRiskLevel riskLevel,
             int riskScore,
-            String riskCategory,
+            KytRiskCategory riskCategory,
             String provider
     ) {
         this.chainType = chainType;
@@ -66,5 +68,23 @@ public class WalletAddressRisk {
         this.provider = provider;
         this.lastCheckedAt = LocalDateTime.now();
         this.createdAt = LocalDateTime.now();
+    }
+
+    public WalletAddressRisk(
+            String chainType,
+            String address,
+            WalletRiskLevel riskLevel,
+            int riskScore,
+            String riskCategory,
+            String provider
+    ) {
+        this(
+                chainType,
+                address,
+                riskLevel,
+                riskScore,
+                KytRiskCategory.valueOf(riskCategory),
+                provider
+        );
     }
 }

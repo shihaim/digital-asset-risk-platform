@@ -16,13 +16,14 @@
 - Outbox 상태 변경
 - Consumer 멱등 처리
 - sync / async 평가 모드 차이
+- KYT Provider Mock fallback 및 WalletRisk 동기화 정책
 
 ## 2. 테스트 계층
 
 | 계층 | 테스트 |
 | --- | --- |
 | Unit Test | Rule, DecisionEngine, Consumer 위임 |
-| Integration Test | WithdrawalService, AdminRiskCaseService, OutboxEventPublisher |
+| Integration Test | WithdrawalService, WalletRiskService KYT fallback, AdminRiskCaseService, OutboxEventPublisher |
 | E2E Test | 출금 요청부터 관리자 심사까지 전체 흐름 |
 
 ## 3. 주요 테스트 목록
@@ -47,7 +48,16 @@
 - 정상 출금 `APPROVED`
 - 위험 출금 `HELD`
 - 고위험 지갑 `BLOCKED`
+- 사전 등록되지 않은 KYT 고위험 지갑 `BLOCKED`
 - RiskCase 생성 여부 검증
+
+### KYT Provider Mock 테스트
+
+- `MockKytProvider` 주소 패턴별 위험도 매핑 검증
+- KYT 위험 주소의 `wallet_address_risk` 저장 검증
+- KYT 정상 주소의 DB 미저장 및 LOW/NORMAL 반환 검증
+- `WalletRiskService` DB miss 시 KYT fallback 검증
+- KYT fallback 결과가 `HIGH_RISK_WALLET` Rule 평가까지 연결되는지 검증
 
 ### Kafka / Outbox 테스트
 

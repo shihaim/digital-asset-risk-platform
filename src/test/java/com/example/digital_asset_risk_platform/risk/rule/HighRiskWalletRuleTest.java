@@ -1,5 +1,6 @@
 package com.example.digital_asset_risk_platform.risk.rule;
 
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.risk.context.RiskContext;
 import com.example.digital_asset_risk_platform.risk.support.RiskContextFixture;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
@@ -21,7 +22,7 @@ public class HighRiskWalletRuleTest {
          */
         //given
         RiskContext context = RiskContextFixture.builder()
-                .walletRisk(WalletRiskLevel.HIGH, 100, "HACKED_FUNDS")
+                .walletRisk(WalletRiskLevel.HIGH, 100, KytRiskCategory.HACKED_FUNDS)
                 .build();
 
         //when
@@ -43,7 +44,7 @@ public class HighRiskWalletRuleTest {
     void case2() {
         //given
         RiskContext context = RiskContextFixture.builder()
-                .walletRisk(WalletRiskLevel.CRITICAL, 100, "SANCTIONED_ADDRESS")
+                .walletRisk(WalletRiskLevel.CRITICAL, 100, KytRiskCategory.SANCTIONED_ADDRESS)
                 .build();
 
         //when
@@ -65,7 +66,7 @@ public class HighRiskWalletRuleTest {
     void case3() {
         //given
         RiskContext context = RiskContextFixture.builder()
-                .walletRisk(WalletRiskLevel.LOW, 0, "NORMAL")
+                .walletRisk(WalletRiskLevel.LOW, 0, KytRiskCategory.NORMAL)
                 .build();
 
         //when
@@ -80,7 +81,7 @@ public class HighRiskWalletRuleTest {
     void case4() {
         //given
         RiskContext context = RiskContextFixture.builder()
-                .walletRisk(WalletRiskLevel.MEDIUM, 30, "SUSPICIOUS")
+                .walletRisk(WalletRiskLevel.MEDIUM, 30, KytRiskCategory.SCAM)
                 .build();
 
         //when

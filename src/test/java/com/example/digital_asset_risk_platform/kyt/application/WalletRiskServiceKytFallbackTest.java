@@ -1,6 +1,7 @@
 package com.example.digital_asset_risk_platform.kyt.application;
 
 import com.example.digital_asset_risk_platform.common.cache.CacheNames;
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletAddressRisk;
@@ -50,7 +51,7 @@ public class WalletRiskServiceKytFallbackTest extends IntegrationTestSupport {
         //then
         assertThat(result).isNotNull();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
-        assertThat(result.riskCategory()).isEqualTo("HACKED_FUNDS");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.HACKED_FUNDS);
         assertThat(walletAddressRiskRepository.existsByChainTypeAndAddress(chainType, address)).isTrue();
     }
 
@@ -67,7 +68,7 @@ public class WalletRiskServiceKytFallbackTest extends IntegrationTestSupport {
         //then
         assertThat(result).isNotNull();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.LOW);
-        assertThat(result.riskCategory()).isEqualTo("NORMAL");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.NORMAL);
         assertThat(walletAddressRiskRepository.existsByChainTypeAndAddress(chainType, address)).isFalse();
     }
 
@@ -83,7 +84,7 @@ public class WalletRiskServiceKytFallbackTest extends IntegrationTestSupport {
                 address,
                 WalletRiskLevel.CRITICAL,
                 99,
-                "MANUAL_SANCTION",
+                KytRiskCategory.SANCTIONED_ADDRESS,
                 "ADMIN"
         ));
 
@@ -94,7 +95,7 @@ public class WalletRiskServiceKytFallbackTest extends IntegrationTestSupport {
         assertThat(result).isNotNull();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.CRITICAL);
         assertThat(result.riskScore()).isEqualTo(99);
-        assertThat(result.riskCategory()).isEqualTo("MANUAL_SANCTION");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.SANCTIONED_ADDRESS);
         assertThat(result.provider()).isEqualTo("ADMIN");
         assertThat(walletAddressRiskRepository.count()).isOne();
     }

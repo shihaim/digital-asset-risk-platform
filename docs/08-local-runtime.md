@@ -358,6 +358,18 @@ SECURITY_AT="$(date -d '20 minutes ago' '+%Y-%m-%dT%H:%M:%S')"
 
 ## 8.1 고위험 지갑 등록
 
+수동으로 등록한 지갑 위험도는 `HIGH_RISK_WALLET` Rule 평가에 사용됩니다. 지갑이 DB에 없으면 FDS 평가 중 KYT Provider Mock fallback이 동작하며, 위험 주소로 판단된 경우 `wallet_address_risk`에 동기화됩니다.
+
+KYT Mock 주소 패턴은 다음과 같습니다. `riskCategory`는 `KytRiskCategory` enum 값으로 전달합니다.
+
+| Address Pattern | RiskLevel | RiskCategory |
+| --- | --- | --- |
+| `SANCTION` | `CRITICAL` | `SANCTIONED_ADDRESS` |
+| `HACKED` | `HIGH` | `HACKED_FUNDS` |
+| `MIXER` | `HIGH` | `MIXER` |
+| `PHISH` | `HIGH` | `PHISHING` |
+| 기타 | `LOW` | `NORMAL` |
+
 ```bash
 curl -X POST "$BASE_URL/api/wallet-risks" \
   -H "Content-Type: application/json" \
@@ -366,7 +378,7 @@ curl -X POST "$BASE_URL/api/wallet-risks" \
     "address": "THACKED000001",
     "riskLevel": "CRITICAL",
     "riskScore": 100,
-    "riskCategory": "SANCTIONED_WALLET",
+    "riskCategory": "SANCTIONED_ADDRESS",
     "provider": "INTERNAL"
   }'
 ```

@@ -30,7 +30,7 @@ public class MockKytProvider implements KytProvider {
                     address,
                     WalletRiskLevel.CRITICAL,
                     100,
-                    KytRiskCategory.SANCTIONED_ADDRESS.name(),
+                    KytRiskCategory.SANCTIONED_ADDRESS,
                     PROVIDER_NAME
             );
         }
@@ -41,7 +41,7 @@ public class MockKytProvider implements KytProvider {
                     address,
                     WalletRiskLevel.HIGH,
                     100,
-                    KytRiskCategory.HACKED_FUNDS.name(),
+                    KytRiskCategory.HACKED_FUNDS,
                     PROVIDER_NAME
             );
         }
@@ -52,7 +52,7 @@ public class MockKytProvider implements KytProvider {
                     address,
                     WalletRiskLevel.HIGH,
                     90,
-                    KytRiskCategory.MIXER.name(),
+                    KytRiskCategory.MIXER,
                     PROVIDER_NAME
             );
         }
@@ -63,7 +63,7 @@ public class MockKytProvider implements KytProvider {
                     address,
                     WalletRiskLevel.HIGH,
                     85,
-                    KytRiskCategory.PHISHING.name(),
+                    KytRiskCategory.PHISHING,
                     PROVIDER_NAME
             );
         }

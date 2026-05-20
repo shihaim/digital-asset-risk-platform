@@ -1,5 +1,6 @@
 package com.example.digital_asset_risk_platform.risk.support;
 
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.risk.context.AccountRiskSnapshot;
 import com.example.digital_asset_risk_platform.risk.application.WalletRiskSnapshot;
 import com.example.digital_asset_risk_platform.risk.context.RiskContext;
@@ -34,7 +35,7 @@ public class RiskContextFixture {
 
         private WalletRiskLevel walletRiskLevel = WalletRiskLevel.LOW;
         private int walletRiskScore = 0;
-        private String walletRiskCategory = "NORMAL";
+        private KytRiskCategory walletRiskCategory = KytRiskCategory.NORMAL;
 
         private boolean newWalletAddress = false;
         private BigDecimal averageWithdrawalAmount = new BigDecimal("100.000000000000000000");
@@ -69,6 +70,14 @@ public class RiskContextFixture {
                 WalletRiskLevel riskLevel,
                 int riskScore,
                 String riskCategory
+        ) {
+            return walletRisk(riskLevel, riskScore, KytRiskCategory.valueOf(riskCategory));
+        }
+
+        public Builder walletRisk(
+                WalletRiskLevel riskLevel,
+                int riskScore,
+                KytRiskCategory riskCategory
         ) {
             this.walletRiskLevel = riskLevel;
             this.walletRiskScore = riskScore;

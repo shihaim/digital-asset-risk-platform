@@ -1,6 +1,7 @@
 package com.example.digital_asset_risk_platform.kyt.application;
 
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCacheResponse;
 import com.example.digital_asset_risk_platform.wallet.repository.WalletAddressRiskRepository;
@@ -36,7 +37,7 @@ class KytLookupServiceTest extends IntegrationTestSupport {
 
         //then
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
-        assertThat(result.riskCategory()).isEqualTo("HACKED_FUNDS");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.HACKED_FUNDS);
         assertThat(result.provider()).isEqualTo("MOCK_KYT");
         assertThat(walletAddressRiskRepository.existsByChainTypeAndAddress(chainType, address)).isTrue();
     }
@@ -54,7 +55,7 @@ class KytLookupServiceTest extends IntegrationTestSupport {
         //then
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.LOW);
         assertThat(result.riskScore()).isZero();
-        assertThat(result.riskCategory()).isEqualTo("NORMAL");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.NORMAL);
         assertThat(walletAddressRiskRepository.existsByChainTypeAndAddress(chainType, address)).isFalse();
     }
 

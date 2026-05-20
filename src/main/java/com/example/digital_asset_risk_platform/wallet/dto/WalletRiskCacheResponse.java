@@ -1,5 +1,6 @@
 package com.example.digital_asset_risk_platform.wallet.dto;
 
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletAddressRisk;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 
@@ -8,7 +9,7 @@ public record WalletRiskCacheResponse(
         String address,
         WalletRiskLevel riskLevel,
         Integer riskScore,
-        String riskCategory,
+        KytRiskCategory riskCategory,
         String provider
 ) {
     public static WalletRiskCacheResponse from(WalletAddressRisk walletRisk) {

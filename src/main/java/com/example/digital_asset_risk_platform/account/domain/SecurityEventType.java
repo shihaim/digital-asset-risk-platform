@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 public enum SecurityEventType {
     PASSWORD_CHANGED("비밀번호 변경"),
     OTP_RESET("OTP 초기화"),
-    PHONE_CHANGED(""),
-    EMAIL_CHANGED(""),
-    WITHDRAWAL_ADDRESS_ADDED("");
+    PHONE_CHANGED("휴대폰 번호 변경"),
+    EMAIL_CHANGED("이메일 변경"),
+    WITHDRAWAL_ADDRESS_ADDED("출금 주소 추가");
     
     private final String description;
 }

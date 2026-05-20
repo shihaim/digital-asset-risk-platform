@@ -1,6 +1,7 @@
 package com.example.digital_asset_risk_platform.wallet.application;
 
 import com.example.digital_asset_risk_platform.common.cache.CacheNames;
+import com.example.digital_asset_risk_platform.kyt.domain.KytRiskCategory;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCacheResponse;
@@ -104,7 +105,7 @@ class WalletRiskServiceCacheTest extends IntegrationTestSupport {
         //then
         assertThat(result).isNotNull();
         assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.LOW);
-        assertThat(result.riskCategory()).isEqualTo("NORMAL");
+        assertThat(result.riskCategory()).isEqualTo(KytRiskCategory.NORMAL);
         assertThat(walletAddressRiskRepository.existsByChainTypeAndAddress(chainType, address)).isFalse();
 
         Cache.ValueWrapper cached = cacheManager
@@ -125,7 +126,7 @@ class WalletRiskServiceCacheTest extends IntegrationTestSupport {
                 "THACKED000003",
                 WalletRiskLevel.LOW,
                 0,
-                "STALE_CACHE",
+                KytRiskCategory.NORMAL,
                 "TEST"
         ));
 

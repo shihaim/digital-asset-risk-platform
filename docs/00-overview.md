@@ -20,6 +20,7 @@
 - 출금 요청에 대한 FDS 평가 자동화
 - 위험 출금의 상태 변경 및 평가 증적 저장
 - 관리자 심사 업무 흐름 구현
+- KYT Provider Mock 기반 외부 지갑 위험도 조회 구조 구현
 - Kafka 기반 이벤트 처리 구조 구성
 - Outbox Pattern 기반 이벤트 발행 안정성 확보
 - sync / async 평가 모드 전환 지원
@@ -34,6 +35,7 @@
 | `RiskRuleHit` | 적중한 Rule과 점수, 사유 저장 |
 | `RiskCase` | 관리자 심사 Case 관리 |
 | `WalletAddressRisk` | 위험 지갑 주소 정보 관리 |
+| `KytProvider` | 외부 KYT 지갑 위험도 조회 인터페이스 |
 | `AccountLoginEvent` | 로그인 및 신규 기기 여부 관리 |
 | `AccountSecurityEvent` | OTP 재설정, 비밀번호 변경 등 보안 이벤트 관리 |
 | `OutboxEvent` | Kafka 발행 대상 이벤트 저장 |

@@ -12,6 +12,7 @@
 - 위험 출금 자동 보류 또는 차단
 - RiskCase 생성 및 관리자 심사
 - 오탐 / 정탐 처리
+- KYT Provider Mock 기반 외부 지갑 위험도 조회 및 내부 WalletRisk 동기화
 - Kafka 기반 이벤트 발행
 - Outbox Pattern 기반 이벤트 발행 안정성 보장
 - Kafka Consumer 기반 감사 로그, 관리자 알림, Rule 통계 처리
@@ -35,6 +36,7 @@
 ```mermaid
 flowchart LR
     Client[Client] --> API[Withdrawal API]
+    API --> KYT[KYT Provider Mock]
     API --> DB[(MariaDB)]
     API --> Outbox[(outbox_event)]
     Outbox --> Publisher[Outbox Publisher]
@@ -107,3 +109,4 @@ docker compose -f docker-compose.yaml up -d
 - [Kafka & Outbox 설계](docs/05-kafka-outbox.md)
 - [멱등성 설계](docs/06-idempotency.md)
 - [테스트 전략](docs/07-test-strategy.md)
+- [KYT Provider Mock 테스트 가이드](docs/09-kyt-provider-mock-test-guide.md)
