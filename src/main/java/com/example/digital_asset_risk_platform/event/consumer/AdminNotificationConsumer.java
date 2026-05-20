@@ -18,7 +18,7 @@ public class AdminNotificationConsumer {
 
     @KafkaListener(
             topics = KafkaTopicConfig.RISK_CASE_CREATED,
-            groupId = "admin-notification-consumer",
+            groupId = "${app.kafka.consumer.group.admin-notification:admin-notification-consumer}",
             containerFactory = "riskCaseCreatedKafkaListenerContainerFactory"
     )
     public void consume(RiskCaseCreatedEvent event, Acknowledgment acknowledgment) {

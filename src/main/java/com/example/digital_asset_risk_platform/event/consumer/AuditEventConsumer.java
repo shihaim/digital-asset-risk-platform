@@ -20,7 +20,7 @@ public class AuditEventConsumer {
 
     @KafkaListener(
             topics = KafkaTopicConfig.WITHDRAWAL_REQUESTED,
-            groupId = "audit-log-consumer",
+            groupId = "${app.kafka.consumer.group.audit-log:audit-log-consumer}",
             containerFactory = "withdrawalRequestedKafkaListenerContainerFactory"
     )
     public void consumeWithdrawalRequested(WithdrawalRequestedEvent event, @Header(KafkaHeaders.RECEIVED_KEY) String key, Acknowledgment acknowledgment) {
@@ -31,7 +31,7 @@ public class AuditEventConsumer {
 
     @KafkaListener(
             topics = KafkaTopicConfig.RISK_EVALUATION_COMPLETED,
-            groupId = "audit-log-consumer",
+            groupId = "${app.kafka.consumer.group.audit-log:audit-log-consumer}",
             containerFactory = "riskEvaluationCompletedKafkaListenerContainerFactory"
     )
     public void consumeRiskEvaluationCompleted(RiskEvaluationCompletedEvent event, @Header(KafkaHeaders.RECEIVED_KEY) String key, Acknowledgment acknowledgment) {
@@ -42,7 +42,7 @@ public class AuditEventConsumer {
 
     @KafkaListener(
             topics = KafkaTopicConfig.RISK_CASE_CREATED,
-            groupId = "audit-log-consumer",
+            groupId = "${app.kafka.consumer.group.audit-log:audit-log-consumer}",
             containerFactory = "riskCaseCreatedKafkaListenerContainerFactory"
     )
     public void consumeRiskCaseCreated(RiskCaseCreatedEvent event, @Header(KafkaHeaders.RECEIVED_KEY) String key, Acknowledgment acknowledgment) {
