@@ -6,7 +6,6 @@ import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCacheResponse;
 import com.example.digital_asset_risk_platform.wallet.dto.WalletRiskCreateRequest;
 import com.example.digital_asset_risk_platform.wallet.repository.WalletAddressRiskRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +14,12 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @TestPropertySource(properties = {"spring.cache.type=redis"})
 class WalletRiskServiceCacheTest extends IntegrationTestSupport {
     @Autowired
     WalletRiskService walletRiskService;
-
-    @Autowired
-    WalletRiskQueryService walletRiskQueryService;
 
     @Autowired
     WalletAddressRiskRepository walletAddressRiskRepository;
@@ -53,17 +51,17 @@ class WalletRiskServiceCacheTest extends IntegrationTestSupport {
         ));
 
         //when
-        WalletRiskCacheResponse result = walletRiskQueryService.getWalletRisk("TRON", "THACKED000001");
+        WalletRiskCacheResponse result = walletRiskService.getWalletRisk("TRON", "THACKED000001");
 
         //then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
+        assertThat(result).isNotNull();
+        assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
 
         Cache.ValueWrapper cached = cacheManager
                 .getCache(CacheNames.WALLET_RISK)
                 .get("TRON:THACKED000001");
 
-        Assertions.assertThat(cached).isNotNull();
+        assertThat(cached).isNotNull();
     }
 
     @Test
@@ -79,34 +77,41 @@ class WalletRiskServiceCacheTest extends IntegrationTestSupport {
                 "MOCK_KYT"
         ));
 
-        WalletRiskCacheResponse first = walletRiskQueryService.getWalletRisk("TRON", "THACKED000002");
+        WalletRiskCacheResponse first = walletRiskService.getWalletRisk("TRON", "THACKED000002");
 
-        Assertions.assertThat(first).isNotNull();
+        assertThat(first).isNotNull();
 
         walletAddressRiskRepository.deleteAll();
 
         //when
-        WalletRiskCacheResponse second = walletRiskQueryService.getWalletRisk("TRON", "THACKED000002");
+        WalletRiskCacheResponse second = walletRiskService.getWalletRisk("TRON", "THACKED000002");
 
         //then
-        Assertions.assertThat(second).isNotNull();
-        Assertions.assertThat(second.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
+        assertThat(second).isNotNull();
+        assertThat(second.riskLevel()).isEqualTo(WalletRiskLevel.HIGH);
     }
 
     @Test
-    @DisplayName("존재하지 않는 지갑 위험도는 캐싱하지 않는다")
+    @DisplayName("DB에 없는 정상 지갑은 KYT LOW 결과를 Redis 캐시에 저장한다")
     void case3() {
+        //given
+        String chainType = "TRON";
+        String address = "TUNKOWN000001";
+
         //when
-        WalletRiskCacheResponse result = walletRiskQueryService.getWalletRisk("TRON", "TUNKOWN000001");
+        WalletRiskCacheResponse result = walletRiskService.getWalletRisk(chainType, address);
 
         //then
-        Assertions.assertThat(result).isNull();
+        assertThat(result).isNotNull();
+        assertThat(result.riskLevel()).isEqualTo(WalletRiskLevel.LOW);
+        assertThat(result.riskCategory()).isEqualTo("NORMAL");
+        assertThat(walletAddressRiskRepository.existsByChainTypeAndAddress(chainType, address)).isFalse();
 
         Cache.ValueWrapper cached = cacheManager
                 .getCache(CacheNames.WALLET_RISK)
                 .get("TRON:TUNKOWN000001");
 
-        Assertions.assertThat(cached).isNull();
+        assertThat(cached).isNotNull();
     }
 
     @Test
@@ -124,7 +129,7 @@ class WalletRiskServiceCacheTest extends IntegrationTestSupport {
                 "TEST"
         ));
 
-        Assertions.assertThat(cache.get("TRON:THACKED000003")).isNotNull();
+        assertThat(cache.get("TRON:THACKED000003")).isNotNull();
 
         //when
         walletRiskService.createWalletRisk(new WalletRiskCreateRequest(
@@ -137,7 +142,7 @@ class WalletRiskServiceCacheTest extends IntegrationTestSupport {
         ));
 
         //then
-        Assertions.assertThat(cache.get("TRON:THACKED000003")).isNull();
+        assertThat(cache.get("TRON:THACKED000003")).isNull();
     }
 
 }

@@ -5,7 +5,6 @@ import com.example.digital_asset_risk_platform.account.domain.SecurityEventType;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
 import com.example.digital_asset_risk_platform.risk.application.WalletRiskSnapshot;
-import com.example.digital_asset_risk_platform.wallet.application.WalletRiskQueryService;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 import com.example.digital_asset_risk_platform.wallet.repository.WithdrawalRequestRepository;
@@ -24,7 +23,6 @@ public class RiskContextBuilder {
     private final AccountSecurityEventRepository securityEventRepository;
     private final WithdrawalRequestRepository withdrawalRequestRepository;
     private final WalletRiskService walletRiskService;
-    private final WalletRiskQueryService walletRiskQueryService;
 
     public RiskContext build(WithdrawalRequest withdrawal) {
         Long userId = withdrawal.getUserId();
@@ -46,8 +44,7 @@ public class RiskContextBuilder {
 
         long withdrawalCountLast24h = withdrawalRequestRepository.countByUserIdAndRequestedAt(userId, twentyFourHoursAgo);
 
-        WalletRiskSnapshot walletRisk = WalletRiskSnapshot.from(walletRiskQueryService.getWalletRisk(withdrawal.getChainType(), withdrawal.getToAddress()));
-//        WalletRiskSnapshot walletRisk = walletRiskService.findRisk(withdrawal.getChainType(), withdrawal.getToAddress());
+        WalletRiskSnapshot walletRisk = WalletRiskSnapshot.from(walletRiskService.getWalletRisk(withdrawal.getChainType(), withdrawal.getToAddress()));
 
         AccountRiskSnapshot accountRisk = new AccountRiskSnapshot(newDeviceLoginWithin1h, passwordChangedWithin24h, otpResetWithin24h);
 
