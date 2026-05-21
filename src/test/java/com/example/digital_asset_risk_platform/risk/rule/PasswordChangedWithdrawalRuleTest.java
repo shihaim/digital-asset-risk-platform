@@ -1,51 +1,80 @@
 package com.example.digital_asset_risk_platform.risk.rule;
 
+import com.example.digital_asset_risk_platform.risk.config.application.RiskRuleConfigService;
+import com.example.digital_asset_risk_platform.risk.config.domain.RiskRuleConfig;
 import com.example.digital_asset_risk_platform.risk.context.RiskContext;
 import com.example.digital_asset_risk_platform.risk.support.RiskContextFixture;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class PasswordChangedWithdrawalRuleTest {
 
-    private final RiskRule rule = new PasswordChangedWithdrawalRule();
+    private final RiskRuleConfigService riskRuleConfigService = mock(RiskRuleConfigService.class);
+    private final RiskRule rule = new PasswordChangedWithdrawalRule(riskRuleConfigService);
 
     @Test
-    @DisplayName("최근 24시간 이내 비밀번호 변경 이벤트가 있으면 룰이 적중한다")
+    @DisplayName("비밀번호 변경 시간이 threshold 안이면 Rule이 적중한다")
     void case1() {
         //given
+        when(riskRuleConfigService.getConfig(RiskRuleCodes.PASSWORD_CHANGED_WITHDRAWAL))
+                .thenReturn(new RiskRuleConfig(
+                        RiskRuleCodes.PASSWORD_CHANGED_WITHDRAWAL,
+                        "비밀번호 변경 후 출금",
+                        true,
+                        45,
+                        true,
+                        "24h",
+                        "비밀번호 변경"
+                ));
+
+        RiskContext base = RiskContextFixture.builder().build();
         RiskContext context = RiskContextFixture.builder()
-                .passwordChangedWithin24h(true)
+                .latestPasswordChangedAt(base.withdrawal().getRequestedAt().minusHours(23))
                 .build();
 
         //when
         Optional<RuleHit> result = rule.evaluate(context);
 
         //then
-        Assertions.assertThat(result).isPresent();
-
+        assertThat(result).isPresent();
         RuleHit hit = result.get();
-        Assertions.assertThat(hit.ruleCode()).isEqualTo("PASSWORD_CHANGED_WITHDRAWAL");
-        Assertions.assertThat(hit.ruleName()).isEqualTo("비밀번호 변경 후 출금");
-        Assertions.assertThat(hit.score()).isEqualTo(30);
-        Assertions.assertThat(hit.blocking()).isFalse();
-        Assertions.assertThat(hit.reason()).contains("비밀번호");
+
+        assertThat(hit.ruleCode()).isEqualTo(RiskRuleCodes.PASSWORD_CHANGED_WITHDRAWAL);
+        assertThat(hit.ruleName()).isEqualTo("비밀번호 변경 후 출금");
+        assertThat(hit.score()).isEqualTo(45);
+        assertThat(hit.blocking()).isTrue();
     }
 
     @Test
-    @DisplayName("최근 24시간 이내 비밀번호 변경 이벤트가 없으면 룰이 적중하지 않는다")
+    @DisplayName("비밀번호 변경 시간이 threshold 밖이면 Rule이 적중하지 않는다")
     void case2() {
         //given
+        when(riskRuleConfigService.getConfig(RiskRuleCodes.PASSWORD_CHANGED_WITHDRAWAL))
+                .thenReturn(new RiskRuleConfig(
+                        RiskRuleCodes.PASSWORD_CHANGED_WITHDRAWAL,
+                        "비밀번호 변경 후 출금",
+                        true,
+                        30,
+                        false,
+                        "24h",
+                        "비밀번호 변경"
+                ));
+
+        RiskContext base = RiskContextFixture.builder().build();
         RiskContext context = RiskContextFixture.builder()
-                .passwordChangedWithin24h(false)
+                .latestPasswordChangedAt(base.withdrawal().getRequestedAt().minusHours(25))
                 .build();
 
         //when
         Optional<RuleHit> result = rule.evaluate(context);
 
         //then
-        Assertions.assertThat(result).isEmpty();
+        assertThat(result).isEmpty();
     }
 }

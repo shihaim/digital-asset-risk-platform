@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AccountLoginEventRepository extends JpaRepository<AccountLoginEvent, Long> {
     List<AccountLoginEvent> findByUserIdAndLoginAtAfter(Long userId, LocalDateTime loginAt);
@@ -13,4 +14,5 @@ public interface AccountLoginEventRepository extends JpaRepository<AccountLoginE
 
     boolean existsByUserIdAndDeviceId(Long userId, String deviceId);
 
+    Optional<AccountLoginEvent> findTopByUserIdAndNewDeviceYnOrderByLoginAtDesc(Long userId, String newDeviceYn);
 }

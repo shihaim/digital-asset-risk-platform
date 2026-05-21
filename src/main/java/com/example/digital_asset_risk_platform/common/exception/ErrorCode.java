@@ -18,6 +18,10 @@ public enum ErrorCode {
     DUPLICATE_RISK_EVALUATION(HttpStatus.CONFLICT, "RISK_EVALUATION_002", "이미 동일 대상에 대한 위험 평가가 존재합니다."),
     UNSUPPORTED_RISK_DECISION(HttpStatus.BAD_REQUEST, "RISK_EVALUATION_003", "지원하지 않는 위험 판단 결과입니다."),
 
+    // Risk Rule
+    RISK_RULE_CONFIG_NOT_FOUND(HttpStatus.NOT_FOUND, "RISK_RULE_CONFIG_001", "Rule 설정을 찾을 수 없습니다."),
+    INVALID_RISK_RULE_CONFIG(HttpStatus.BAD_REQUEST, "RISK_RULE_CONFIG_002", "Rule 설정 값이 올바르지 않습니다."),
+
     // Risk Case
     RISK_CASE_NOT_FOUND(HttpStatus.NOT_FOUND, "RISK_CASE_001", "RiskCase를 찾을 수 없습니다."),
     INVALID_RISK_CASE_STATUS(HttpStatus.BAD_REQUEST, "RISK_CASE_002", "현재 Case 상태에서는 요청한 처리를 수행할 수 없습니다."),

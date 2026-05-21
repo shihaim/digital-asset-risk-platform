@@ -1,6 +1,7 @@
 package com.example.digital_asset_risk_platform.risk.context;
 
 import com.example.digital_asset_risk_platform.account.domain.AccountLoginEvent;
+import com.example.digital_asset_risk_platform.account.domain.AccountSecurityEvent;
 import com.example.digital_asset_risk_platform.account.domain.SecurityEventType;
 import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
 import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -28,15 +28,22 @@ public class RiskContextBuilder {
         Long userId = withdrawal.getUserId();
         LocalDateTime now = withdrawal.getRequestedAt();
 
-        LocalDateTime oneHourAgo = now.minusHours(1);
         LocalDateTime twentyFourHoursAgo = now.minusHours(24);
 
-        List<AccountLoginEvent> recentLogins = loginEventRepository.findByUserIdAndLoginAtAfter(userId, oneHourAgo);
+        LocalDateTime latestNewDeviceLoginAt = loginEventRepository
+                .findTopByUserIdAndNewDeviceYnOrderByLoginAtDesc(userId, "Y")
+                .map(AccountLoginEvent::getLoginAt)
+                .orElse(null);
 
-        boolean newDeviceLoginWithin1h = recentLogins.stream().anyMatch(AccountLoginEvent::isNewDevice);
+        LocalDateTime latestPasswordChangedAt = securityEventRepository
+                .findTopByUserIdAndEventTypeOrderByEventAtDesc(userId, SecurityEventType.PASSWORD_CHANGED)
+                .map(AccountSecurityEvent::getEventAt)
+                .orElse(null);
 
-        boolean passwordChangedWithin24h = securityEventRepository.existsByUserIdAndEventTypeAndEventAtAfter(userId, SecurityEventType.PHONE_CHANGED, twentyFourHoursAgo);
-        boolean otpResetWithin24h = securityEventRepository.existsByUserIdAndEventTypeAndEventAtAfter(userId, SecurityEventType.OTP_RESET, twentyFourHoursAgo);
+        LocalDateTime latestOtpResetAt = securityEventRepository
+                .findTopByUserIdAndEventTypeOrderByEventAtDesc(userId, SecurityEventType.OTP_RESET)
+                .map(AccountSecurityEvent::getEventAt)
+                .orElse(null);
 
         boolean usedAddressBefore = withdrawalRequestRepository.existsByUserIdAndChainTypeAndToAddressAndIdNot(userId, withdrawal.getChainType(), withdrawal.getToAddress(), withdrawal.getId());
 
@@ -46,7 +53,7 @@ public class RiskContextBuilder {
 
         WalletRiskSnapshot walletRisk = WalletRiskSnapshot.from(walletRiskService.getWalletRisk(withdrawal.getChainType(), withdrawal.getToAddress()));
 
-        AccountRiskSnapshot accountRisk = new AccountRiskSnapshot(newDeviceLoginWithin1h, passwordChangedWithin24h, otpResetWithin24h);
+        AccountRiskSnapshot accountRisk = new AccountRiskSnapshot(latestNewDeviceLoginAt, latestPasswordChangedAt, latestOtpResetAt);
 
         return new RiskContext(
                 withdrawal,

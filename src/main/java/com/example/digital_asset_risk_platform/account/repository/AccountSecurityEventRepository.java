@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AccountSecurityEventRepository extends JpaRepository<AccountSecurityEvent, Long> {
     List<AccountSecurityEvent> findByUserIdAndEventAtAfter(Long userId, LocalDateTime eventAt);
@@ -13,4 +14,6 @@ public interface AccountSecurityEventRepository extends JpaRepository<AccountSec
     List<AccountSecurityEvent> findByUserIdAndEventAtAfterOrderByEventAtDesc(Long userId, LocalDateTime eventAt);
 
     boolean existsByUserIdAndEventTypeAndEventAtAfter(Long userId, SecurityEventType eventType, LocalDateTime eventAt);
+
+    Optional<AccountSecurityEvent> findTopByUserIdAndEventTypeOrderByEventAtDesc(Long userId, SecurityEventType eventType);
 }

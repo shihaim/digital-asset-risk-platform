@@ -8,6 +8,7 @@ import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class RiskContextFixture {
     private RiskContextFixture() {
@@ -33,6 +34,11 @@ public class RiskContextFixture {
         private boolean passwordChangedWithin24h = false;
         private boolean otpResetWithin24h = false;
 
+        private LocalDateTime requestedAt = LocalDateTime.now();
+        private LocalDateTime latestNewDeviceLoginAt = null;
+        private LocalDateTime latestPasswordChangedAt = null;
+        private LocalDateTime latestOtpResetAt = null;
+
         private WalletRiskLevel walletRiskLevel = WalletRiskLevel.LOW;
         private int walletRiskScore = 0;
         private KytRiskCategory walletRiskCategory = KytRiskCategory.NORMAL;
@@ -52,17 +58,17 @@ public class RiskContextFixture {
         }
 
         public Builder newDeviceLoginWithin1h(boolean value) {
-            this.newDeviceLoginWithin1h = value;
+            this.latestNewDeviceLoginAt = value ? requestedAt.minusMinutes(30) : null;
             return this;
         }
 
         public Builder passwordChangedWithin24h(boolean value) {
-            this.passwordChangedWithin24h = value;
+            this.latestPasswordChangedAt = value ? requestedAt.minusHours(12) : null;
             return this;
         }
 
         public Builder otpResetWithin24h(boolean value) {
-            this.otpResetWithin24h = value;
+            this.latestOtpResetAt = value ? requestedAt.minusHours(12) : null;
             return this;
         }
 
@@ -100,6 +106,26 @@ public class RiskContextFixture {
             return this;
         }
 
+        public Builder requestedAt(LocalDateTime requestedAt) {
+            this.requestedAt = requestedAt;
+            return this;
+        }
+
+        public Builder latestNewDeviceLoginAt(LocalDateTime value) {
+            this.latestNewDeviceLoginAt = value;
+            return this;
+        }
+
+        public Builder latestPasswordChangedAt(LocalDateTime value) {
+            this.latestPasswordChangedAt = value;
+            return this;
+        }
+
+        public Builder latestOtpResetAt(LocalDateTime value) {
+            this.latestOtpResetAt = value;
+            return this;
+        }
+
         public RiskContext build() {
             WithdrawalRequest withdrawal = new WithdrawalRequest(
                     userId,
@@ -110,9 +136,9 @@ public class RiskContextFixture {
             );
 
             AccountRiskSnapshot accountRisk = new AccountRiskSnapshot(
-                    newDeviceLoginWithin1h,
-                    passwordChangedWithin24h,
-                    otpResetWithin24h
+                    latestNewDeviceLoginAt,
+                    latestPasswordChangedAt,
+                    latestOtpResetAt
             );
 
             WalletRiskSnapshot walletRisk = new WalletRiskSnapshot(

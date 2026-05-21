@@ -24,12 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
 
-//@TestPropertySource(properties = {"fds.evaluation.mode=sync"})
 public class WithdrawalSyncEvaluationTest extends IntegrationTestSupport {
 
     @Autowired

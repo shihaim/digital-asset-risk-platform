@@ -29,8 +29,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.math.BigDecimal;
 
 @TestPropertySource(properties = {
-        "spring.cache.type=redis",
-        "fds.evaluation.mode=sync"
+        "spring.cache.type=redis"
 })
 public class FdsWalletRiskCacheIntegrationTest extends IntegrationTestSupport {
 
