@@ -13,10 +13,12 @@ import com.example.digital_asset_risk_platform.outbox.application.OutboxEventPub
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEvent;
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEventStatus;
 import com.example.digital_asset_risk_platform.outbox.repository.OutboxEventRepository;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.domain.RiskEvaluation;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.statistics.domain.RiskRuleStatistics;
 import com.example.digital_asset_risk_platform.statistics.repository.RiskRuleStatisticsRepository;
 import com.example.digital_asset_risk_platform.support.KafkaIntegrationTestSupport;
@@ -82,6 +84,9 @@ public class KafkaFullWithdrawalFdsE2ETest extends KafkaIntegrationTestSupport {
     RiskCaseRepository riskCaseRepository;
 
     @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @Autowired
     ConsumerProcessedEventRepository consumerProcessedEventRepository;
 
     @Autowired
@@ -111,6 +116,8 @@ public class KafkaFullWithdrawalFdsE2ETest extends KafkaIntegrationTestSupport {
 
         accountSecurityEventRepository.deleteAll();
         accountLoginEventRepository.deleteAll();
+
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test

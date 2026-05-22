@@ -49,7 +49,7 @@ public class HighAmountWithdrawalRuleTest {
         assertThat(hit.ruleName()).isEqualTo("평균 대비 고액 출금");
         assertThat(hit.score()).isEqualTo(70);
         assertThat(hit.blocking()).isFalse();
-//        assertThat(hit.reason()).contains("5배"); // TODO: RiskRuleConfig의 description과 RuleHit의 reason이 맞지 않음.
+        assertThat(hit.reason()).contains("5배");
     }
 
     @Test
@@ -110,6 +110,7 @@ public class HighAmountWithdrawalRuleTest {
         assertThat(hit.ruleName()).isEqualTo("고액 출금");
         assertThat(hit.score()).isEqualTo(40);
         assertThat(hit.blocking()).isFalse();
+        assertThat(hit.reason()).contains("고정");
     }
 
     @Test

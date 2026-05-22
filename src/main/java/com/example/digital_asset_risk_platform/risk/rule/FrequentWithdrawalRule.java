@@ -27,11 +27,16 @@ public class FrequentWithdrawalRule implements RiskRule {
             return Optional.empty();
         }
 
+        String reason = config.getDescription();
+        if (reason == null || reason.isBlank()) {
+            reason = "최근 24시간 내 출금 요청 횟수가 5회 이상";
+        }
+
         return Optional.of(new RuleHit(
                 config.getRuleCode(),
                 config.getRuleName(),
                 config.getScore(),
-                "최근 24시간 내 출금 요청 횟수가 5회 이상",
+                reason,
                 config.isBlocking()
         ));
     }

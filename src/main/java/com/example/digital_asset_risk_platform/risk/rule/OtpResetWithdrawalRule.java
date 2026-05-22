@@ -29,11 +29,16 @@ public class OtpResetWithdrawalRule implements RiskRule {
             return Optional.empty();
         }
 
+        String reason = config.getDescription();
+        if (reason == null || reason.isBlank()) {
+            reason = "최근 24시간 이내 OTP 재설정 후 출금 요청";
+        }
+
         return Optional.of(new RuleHit(
                 config.getRuleCode(),
                 config.getRuleName(),
                 config.getScore(),
-                "최근 24시간 이내 OTP 재설정 후 출금 요청",
+                reason,
                 config.isBlocking()
         ));
     }

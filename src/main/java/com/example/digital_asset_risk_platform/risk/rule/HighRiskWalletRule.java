@@ -26,11 +26,16 @@ public class HighRiskWalletRule implements RiskRule {
             return Optional.empty();
         }
 
+        String reason = config.getDescription();
+        if (reason == null || reason.isBlank()) {
+            reason = "출금 주소가 고위험 지갑 주소로 분류됨: " + context.walletRisk().riskCategory();
+        }
+
         return Optional.of(new RuleHit(
                 config.getRuleCode(),
                 config.getRuleName(),
                 config.getScore(),
-                "출금 주소가 고위험 지갑 주소로 분류됨: " + context.walletRisk().riskCategory(),
+                reason,
                 config.isBlocking()
         ));
     }

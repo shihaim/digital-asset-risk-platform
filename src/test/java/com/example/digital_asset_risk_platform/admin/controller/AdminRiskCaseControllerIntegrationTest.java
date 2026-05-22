@@ -4,10 +4,12 @@ import com.example.digital_asset_risk_platform.account.application.AccountEventS
 import com.example.digital_asset_risk_platform.account.domain.SecurityEventType;
 import com.example.digital_asset_risk_platform.account.dto.LoginEventCreateRequest;
 import com.example.digital_asset_risk_platform.account.dto.SecurityEventCreateRequest;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.domain.RiskCaseStatus;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
 import com.example.digital_asset_risk_platform.wallet.application.WithdrawalService;
@@ -52,6 +54,9 @@ public class AdminRiskCaseControllerIntegrationTest extends IntegrationTestSuppo
     RiskCaseRepository riskCaseRepository;
 
     @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @Autowired
     RiskEvaluationRepository riskEvaluationRepository;
 
     @Autowired
@@ -70,6 +75,8 @@ public class AdminRiskCaseControllerIntegrationTest extends IntegrationTestSuppo
         riskEvaluationRepository.deleteAll();
         withdrawalRequestRepository.deleteAll();
         walletAddressRiskRepository.deleteAll();
+
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test

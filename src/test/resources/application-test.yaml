@@ -10,6 +10,8 @@ spring:
   kafka:
     listener:
       auto-startup: false
+    admin:
+      auto-create: false
 
   cache:
     type: simple

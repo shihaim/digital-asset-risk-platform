@@ -2,10 +2,12 @@ package com.example.digital_asset_risk_platform.risk.application;
 
 import com.example.digital_asset_risk_platform.common.cache.CacheNames;
 import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.domain.RiskRuleHit;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
 import com.example.digital_asset_risk_platform.wallet.application.WithdrawalService;
@@ -55,6 +57,9 @@ public class FdsWalletRiskCacheIntegrationTest extends IntegrationTestSupport {
     RiskCaseRepository riskCaseRepository;
 
     @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @Autowired
     CacheManager cacheManager;
 
     @MockitoBean
@@ -73,6 +78,8 @@ public class FdsWalletRiskCacheIntegrationTest extends IntegrationTestSupport {
 
         withdrawalRequestRepository.deleteAll();
         walletAddressRiskRepository.deleteAll();
+
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test

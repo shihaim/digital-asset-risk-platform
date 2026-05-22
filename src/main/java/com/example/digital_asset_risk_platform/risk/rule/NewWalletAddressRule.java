@@ -26,11 +26,16 @@ public class NewWalletAddressRule implements RiskRule {
             return Optional.empty();
         }
 
+        String reason = config.getDescription();
+        if (reason == null || reason.isBlank()) {
+            reason = "사용자가 과거에 출금한 적 없는 신규 지갑 주소";
+        }
+
         return Optional.of(new RuleHit(
                 config.getRuleCode(),
                 config.getRuleName(),
                 config.getScore(),
-                "사용자가 과거에 출금한 적 없는 신규 지갑 주소",
+                reason,
                 config.isBlocking()
         ));
     }

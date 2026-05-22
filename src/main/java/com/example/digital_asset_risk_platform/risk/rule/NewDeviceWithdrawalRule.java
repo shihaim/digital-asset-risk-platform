@@ -28,11 +28,16 @@ public class NewDeviceWithdrawalRule implements RiskRule {
             return Optional.empty();
         }
 
+        String reason = config.getDescription();
+        if (reason == null || reason.isBlank()) {
+            reason = "최근 1시간 이내 신규 기기 로그인 후 출금 요청";
+        }
+
         return Optional.of(new RuleHit(
                config.getRuleCode(),
                 config.getRuleName(),
                 config.getScore(),
-                "최근 1시간 이내 신규 기기 로그인 후 출금 요청",
+                reason,
                 config.isBlocking()
         ));
     }

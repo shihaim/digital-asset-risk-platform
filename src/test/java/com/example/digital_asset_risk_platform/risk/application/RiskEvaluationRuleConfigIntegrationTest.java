@@ -8,6 +8,7 @@ import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRep
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
 import com.example.digital_asset_risk_platform.risk.rule.RiskRuleCodes;
 import com.example.digital_asset_risk_platform.risk.rule.RuleHit;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletAddressRisk;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
@@ -27,16 +28,22 @@ public class RiskEvaluationRuleConfigIntegrationTest extends IntegrationTestSupp
 
     @Autowired
     RiskEvaluationService riskEvaluationService;
+
     @Autowired
     RiskRuleConfigRepository riskRuleConfigRepository;
+
     @Autowired
     WithdrawalRequestRepository withdrawalRequestRepository;
+
     @Autowired
     WalletAddressRiskRepository walletAddressRiskRepository;
+
     @Autowired
     RiskEvaluationRepository riskEvaluationRepository;
+
     @Autowired
     RiskRuleHitRepository riskRuleHitRepository;
+
 
     @BeforeEach
     void setUp() {
@@ -44,9 +51,8 @@ public class RiskEvaluationRuleConfigIntegrationTest extends IntegrationTestSupp
         riskEvaluationRepository.deleteAll();
         withdrawalRequestRepository.deleteAll();
         walletAddressRiskRepository.deleteAll();
-        riskRuleConfigRepository.deleteAll();
 
-        saveDefaultConfigs();
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test
@@ -135,72 +141,6 @@ public class RiskEvaluationRuleConfigIntegrationTest extends IntegrationTestSupp
                 "TRON",
                 address,
                 new BigDecimal("10000.000000000000000000")
-        ));
-    }
-
-    private void saveDefaultConfigs() {
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.NEW_DEVICE_WITHDRAWAL,
-                "신규 기기 로그인 후 출금"
-                , true
-                , 30
-                , false
-                , "60m",
-                "신규 기기"
-        ));
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.OTP_RESET_WITHDRAWAL,
-                "OTP 재설정 후 출금",
-                true,
-                40,
-                false,
-                "24h",
-                "OTP 재설정"
-        ));
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.PASSWORD_CHANGED_WITHDRAWAL,
-                "비밀번호 변경 후 출금",
-                true,
-                30,
-                false,
-                "24h",
-                "비밀번호 변경"
-        ));
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.NEW_WALLET_ADDRESS,
-                "신규 지갑 주소 출금",
-                true,
-                20,
-                false,
-                null,
-                "신규 지갑"
-        ));
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.HIGH_AMOUNT_WITHDRAWAL,
-                "평균 대비 고액 출금",
-                true,
-                40,
-                false,
-                "10x",
-                "고액 출금"
-        ));
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.FREQUENT_WITHDRAWAL_24H,
-                "24시간 내 반복 출금",
-                true,
-                30,
-                false,
-                "5",
-                "반복 출금"
-        ));
-        riskRuleConfigRepository.save(new RiskRuleConfig(
-                RiskRuleCodes.HIGH_RISK_WALLET,
-                "고위험 지갑 주소 출금",
-                true,
-                100,
-                true,
-                null,
-                "고위험 지갑"
         ));
     }
 }

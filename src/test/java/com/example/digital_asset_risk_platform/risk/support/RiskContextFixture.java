@@ -25,14 +25,10 @@ public class RiskContextFixture {
     public static class Builder {
 
         private Long userId = 10001L;
-        private String assetSymbol = "USDT";
-        private String chainType = "TRON";
-        private String toAddress = "TNORMAL000001";
+        private final String assetSymbol = "USDT";
+        private final String chainType = "TRON";
+        private final String toAddress = "TNORMAL000001";
         private BigDecimal amount = new BigDecimal("100.000000000000000000");
-
-        private boolean newDeviceLoginWithin1h = false;
-        private boolean passwordChangedWithin24h = false;
-        private boolean otpResetWithin24h = false;
 
         private LocalDateTime requestedAt = LocalDateTime.now();
         private LocalDateTime latestNewDeviceLoginAt = null;

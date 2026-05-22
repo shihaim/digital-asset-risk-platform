@@ -42,11 +42,16 @@ public class HighAmountWithdrawalRule implements RiskRule {
             return Optional.empty();
         }
 
+        String reason = config.getDescription();
+        if (reason == null || reason.isBlank()) {
+            reason = "이번 출금액이 사용자 평균 출금액의 10배 이상";
+        }
+
         return Optional.of(new RuleHit(
                 config.getRuleCode(),
                 config.getRuleName(),
                 config.getScore(),
-                "이번 출금액이 사용자 평균 출금액의 10배 이상",
+                reason,
                 config.isBlocking()
         ));
     }
