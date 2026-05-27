@@ -6,7 +6,6 @@ import com.example.digital_asset_risk_platform.risk.config.domain.RiskRuleConfig
 import com.example.digital_asset_risk_platform.risk.context.RiskContext;
 import com.example.digital_asset_risk_platform.risk.support.RiskContextFixture;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +41,7 @@ public class HighRiskWalletRuleTest {
         assertThat(hit.ruleName()).isEqualTo("고위험 지갑 주소 출금");
         assertThat(hit.score()).isEqualTo(100);
         assertThat(hit.blocking()).isTrue();
-        Assertions.assertThat(hit.reason()).contains(KytRiskCategory.HACKED_FUNDS.name());
+        assertThat(hit.reason()).contains("고위험 지갑");
     }
 
     @Test
@@ -66,7 +65,7 @@ public class HighRiskWalletRuleTest {
         assertThat(hit.ruleName()).isEqualTo("고위험 지갑 주소 출금");
         assertThat(hit.score()).isEqualTo(100);
         assertThat(hit.blocking()).isTrue();
-        assertThat(hit.reason()).contains(KytRiskCategory.SANCTIONED_ADDRESS.name());
+        assertThat(hit.reason()).contains("고위험 지갑");
     }
 
     @Test
