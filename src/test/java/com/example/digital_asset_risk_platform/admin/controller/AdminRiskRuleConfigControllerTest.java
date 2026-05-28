@@ -13,7 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,7 +100,9 @@ class AdminRiskRuleConfigControllerTest extends IntegrationTestSupport {
               "enabled": false,
               "score": 80,
               "blocking": false,
-              "description": "비활성화 테스트"
+              "description": "비활성화 테스트",
+              "changedBy": "admin",
+              "changeReason": "비활성화 테스트"
             }
         """;
 

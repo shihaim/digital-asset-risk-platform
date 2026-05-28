@@ -1,6 +1,7 @@
 package com.example.digital_asset_risk_platform.admin.controller;
 
 import com.example.digital_asset_risk_platform.risk.config.application.RiskRuleConfigAdminService;
+import com.example.digital_asset_risk_platform.risk.config.dto.RiskRuleConfigHistoryResponse;
 import com.example.digital_asset_risk_platform.risk.config.dto.RiskRuleConfigResponse;
 import com.example.digital_asset_risk_platform.risk.config.dto.RiskRuleConfigUpdateRequest;
 import jakarta.validation.Valid;
@@ -30,5 +31,10 @@ public class AdminRiskRuleConfigController {
     @PatchMapping("/{ruleCode}")
     public ResponseEntity<RiskRuleConfigResponse> updateRuleConfig(@PathVariable String ruleCode, @Valid @RequestBody RiskRuleConfigUpdateRequest request) {
         return ResponseEntity.ok(riskRuleConfigAdminService.updateRuleConfig(ruleCode, request));
+    }
+
+    @GetMapping("/{ruleCode}/histories")
+    public ResponseEntity<List<RiskRuleConfigHistoryResponse>> getRuleConfigHistories(@PathVariable String ruleCode) {
+        return ResponseEntity.ok(riskRuleConfigAdminService.getRuleConfigHistories(ruleCode));
     }
 }

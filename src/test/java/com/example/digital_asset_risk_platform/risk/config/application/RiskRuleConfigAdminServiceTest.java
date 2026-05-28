@@ -1,8 +1,12 @@
 package com.example.digital_asset_risk_platform.risk.config.application;
 
+import com.example.digital_asset_risk_platform.common.exception.BusinessException;
+import com.example.digital_asset_risk_platform.common.exception.ErrorCode;
 import com.example.digital_asset_risk_platform.risk.config.domain.RiskRuleConfig;
+import com.example.digital_asset_risk_platform.risk.config.domain.RiskRuleConfigHistory;
 import com.example.digital_asset_risk_platform.risk.config.dto.RiskRuleConfigResponse;
 import com.example.digital_asset_risk_platform.risk.config.dto.RiskRuleConfigUpdateRequest;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigHistoryRepository;
 import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.rule.RiskRuleCodes;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
@@ -14,25 +18,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
 
     @Autowired
-    RiskRuleConfigAdminService adminService;
+    RiskRuleConfigAdminService riskRuleConfigAdminService;
 
     @Autowired
-    RiskRuleConfigRepository repository;
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @Autowired
+    RiskRuleConfigHistoryRepository riskRuleConfigHistoryRepository;
 
     @BeforeEach
     void setUp() {
-        repository.deleteAll();
+        riskRuleConfigRepository.deleteAll();
+        riskRuleConfigHistoryRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Rule 설정 목록을 조회한다")
     void case1() {
         //given
-        repository.save(new RiskRuleConfig(
+        riskRuleConfigRepository.save(new RiskRuleConfig(
                 RiskRuleCodes.HIGH_RISK_WALLET,
                 "고위험 지갑 주소 출금",
                 true,
@@ -43,7 +52,7 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
         ));
 
         //when
-        List<RiskRuleConfigResponse> result = adminService.getRuleConfigs();
+        List<RiskRuleConfigResponse> result = riskRuleConfigAdminService.getRuleConfigs();
 
         //then
         assertThat(result).hasSize(1);
@@ -54,7 +63,7 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
     @DisplayName("Rule 설정 상세를 조회한다")
     void case2() {
         //given
-        repository.save(new RiskRuleConfig(
+        riskRuleConfigRepository.save(new RiskRuleConfig(
                 RiskRuleCodes.OTP_RESET_WITHDRAWAL,
                 "OTP 재설정 후 출금",
                 true,
@@ -65,7 +74,7 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
         ));
 
         //when
-        RiskRuleConfigResponse response = adminService.getRuleConfig(RiskRuleCodes.OTP_RESET_WITHDRAWAL);
+        RiskRuleConfigResponse response = riskRuleConfigAdminService.getRuleConfig(RiskRuleCodes.OTP_RESET_WITHDRAWAL);
 
         //then
         assertThat(response.ruleCode()).isEqualTo(RiskRuleCodes.OTP_RESET_WITHDRAWAL);
@@ -76,7 +85,7 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
     @DisplayName("Rule 설정을 수정한다")
     void case3() {
         //given
-        repository.save(new RiskRuleConfig(
+        riskRuleConfigRepository.save(new RiskRuleConfig(
                 RiskRuleCodes.HIGH_RISK_WALLET,
                 "고위험 지갑 주소 출금",
                 true,
@@ -91,16 +100,94 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
                 80,
                 false,
                 null,
-                "비활성화 테스트"
+                "비활성화 테스트",
+                "admin",
+                "Rule 설정 테스트"
         );
 
         //when
-        RiskRuleConfigResponse response = adminService.updateRuleConfig(RiskRuleCodes.HIGH_RISK_WALLET, request);
+        RiskRuleConfigResponse response = riskRuleConfigAdminService.updateRuleConfig(RiskRuleCodes.HIGH_RISK_WALLET, request);
 
         //then
         assertThat(response.enabled()).isFalse();
         assertThat(response.score()).isEqualTo(80);
         assertThat(response.blocking()).isFalse();
         assertThat(response.description()).isEqualTo("비활성화 테스트");
+    }
+
+    @Test
+    @DisplayName("Rule 설정을 수정하면 변경 전/후 이력이 저장된다")
+    void case4() {
+        //given
+        riskRuleConfigRepository.save(new RiskRuleConfig(
+                RiskRuleCodes.HIGH_RISK_WALLET,
+                "고위험 지갑 주소 출금",
+                true,
+                100,
+                true,
+                null,
+                "고위험 지갑 주소로 출금하는 경우 차단"
+        ));
+
+        RiskRuleConfigUpdateRequest request = new RiskRuleConfigUpdateRequest(
+                true,
+                80,
+                true,
+                null,
+                "오탐 감소를 위해 점수를 조정",
+                "admin",
+                "고위험 지갑 Rule 점수 조정"
+        );
+
+        //when
+        RiskRuleConfigResponse response = riskRuleConfigAdminService.updateRuleConfig(RiskRuleCodes.HIGH_RISK_WALLET, request);
+
+        //then
+        assertThat(response.ruleCode()).isEqualTo(RiskRuleCodes.HIGH_RISK_WALLET);
+        assertThat(response.score()).isEqualTo(80);
+        assertThat(response.description()).isEqualTo("오탐 감소를 위해 점수를 조정");
+
+        List<RiskRuleConfigHistory> histories = riskRuleConfigHistoryRepository.findByRuleCodeOrderByChangedByDesc(RiskRuleCodes.HIGH_RISK_WALLET);
+        assertThat(histories).hasSize(1);
+
+        RiskRuleConfigHistory history = histories.get(0);
+        assertThat(history.getRuleCode()).isEqualTo(RiskRuleCodes.HIGH_RISK_WALLET);
+        assertThat(history.getRuleName()).isEqualTo("고위험 지갑 주소 출금");
+
+        assertThat(history.isBeforeBlocking()).isTrue();
+        assertThat(history.isAfterBlocking()).isTrue();
+
+        assertThat(history.getBeforeScore()).isEqualTo(100);
+        assertThat(history.getAfterScore()).isEqualTo(80);
+
+        assertThat(history.getBeforeDescription()).isEqualTo("고위험 지갑 주소로 출금하는 경우 차단");
+        assertThat(history.getAfterDescription()).isEqualTo("오탐 감소를 위해 점수를 조정");
+
+        assertThat(history.getChangedBy()).isEqualTo("admin");
+        assertThat(history.getChangeReason()).isEqualTo("고위험 지갑 Rule 점수 조정");
+        assertThat(history.getChangedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Rule 설정을 수정하면 변경 전/후 이력이 저장된다")
+    void case5() {
+        //given
+        RiskRuleConfigUpdateRequest request = new RiskRuleConfigUpdateRequest(
+                true,
+                80,
+                true,
+                null,
+                "설명 변경",
+                "admin",
+                "존재하지 않는 Rule 수정 시도"
+        );
+
+        //when&then
+        assertThatThrownBy(() -> riskRuleConfigAdminService.updateRuleConfig("NOT_EXISTS_RULE", request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.RISK_RULE_CONFIG_NOT_FOUND.getMessage());
+
+        List<RiskRuleConfigHistory> histories = riskRuleConfigHistoryRepository.findAll();
+        assertThat(histories).isEmpty();
     }
 }
