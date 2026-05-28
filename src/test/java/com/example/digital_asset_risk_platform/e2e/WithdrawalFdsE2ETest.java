@@ -22,10 +22,12 @@ import com.example.digital_asset_risk_platform.outbox.domain.OutboxEvent;
 import com.example.digital_asset_risk_platform.outbox.domain.OutboxEventStatus;
 import com.example.digital_asset_risk_platform.outbox.repository.OutboxEventRepository;
 import com.example.digital_asset_risk_platform.risk.application.FdsWithdrawalEvaluationService;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.domain.*;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.statistics.repository.RiskRuleStatisticsRepository;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.application.WalletRiskService;
@@ -98,6 +100,9 @@ public class WithdrawalFdsE2ETest extends IntegrationTestSupport {
     RiskCaseRepository riskCaseRepository;
 
     @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @Autowired
     OutboxEventRepository outboxEventRepository;
 
     @Autowired
@@ -132,6 +137,8 @@ public class WithdrawalFdsE2ETest extends IntegrationTestSupport {
 
         accountSecurityEventRepository.deleteAll();
         accountLoginEventRepository.deleteAll();
+
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test

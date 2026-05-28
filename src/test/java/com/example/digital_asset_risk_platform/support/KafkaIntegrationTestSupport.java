@@ -1,5 +1,9 @@
 package com.example.digital_asset_risk_platform.support;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -19,6 +23,9 @@ public abstract class KafkaIntegrationTestSupport extends IntegrationTestSupport
 
     static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("apache/kafka-native:3.8.0"));
 
+    @Autowired
+    KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
     static {
         kafka.start();
     }
@@ -26,5 +33,11 @@ public abstract class KafkaIntegrationTestSupport extends IntegrationTestSupport
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+    }
+
+    @BeforeEach
+    void waitForKafkaListeners() {
+        kafkaListenerEndpointRegistry.getListenerContainers()
+                .forEach(container -> ContainerTestUtils.waitForAssignment(container, 1));
     }
 }

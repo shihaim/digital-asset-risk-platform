@@ -1,6 +1,9 @@
 package com.example.digital_asset_risk_platform.wallet.controller;
 
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,14 @@ public class WithdrawalControllerIntegrationTest extends IntegrationTestSupport 
 
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @BeforeEach
+    void setUp() {
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
+    }
 
     @Test
     @DisplayName("출금 요청 API를 호출하면 출금 요청이 생성되고 FDS 평가 결과를 응답한다")

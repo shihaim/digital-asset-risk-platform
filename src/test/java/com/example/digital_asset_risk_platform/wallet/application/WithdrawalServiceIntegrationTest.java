@@ -10,10 +10,12 @@ import com.example.digital_asset_risk_platform.event.dto.RiskCaseCreatedEvent;
 import com.example.digital_asset_risk_platform.event.dto.RiskEvaluationCompletedEvent;
 import com.example.digital_asset_risk_platform.event.dto.WithdrawalRequestedEvent;
 import com.example.digital_asset_risk_platform.event.publisher.DomainEventPublisher;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.domain.*;
 import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
 import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.domain.WalletRiskLevel;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
@@ -71,6 +73,9 @@ class WithdrawalServiceIntegrationTest extends IntegrationTestSupport {
     @Autowired
     RiskCaseRepository riskCaseRepository;
 
+    @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
     @MockitoBean
     DomainEventPublisher domainEventPublisher;
 
@@ -83,6 +88,8 @@ class WithdrawalServiceIntegrationTest extends IntegrationTestSupport {
         walletAddressRiskRepository.deleteAll();
         accountSecurityEventRepository.deleteAll();
         accountLoginEventRepository.deleteAll();
+
+        RiskRuleConfigFixture.ensureDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test
