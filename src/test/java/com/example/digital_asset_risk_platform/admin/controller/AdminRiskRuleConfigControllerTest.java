@@ -95,21 +95,21 @@ class AdminRiskRuleConfigControllerTest extends IntegrationTestSupport {
         ));
 
         //when
-        String body = """
+        String requestBody = """
             {
-              "enabled": false,
-              "score": 80,
-              "blocking": false,
-              "description": "비활성화 테스트",
-              "changedBy": "admin",
-              "changeReason": "비활성화 테스트"
+                "enabled": false,
+                "score": 80,
+                "blocking": false,
+                "description": "비활성화 테스트",
+                "changedBy": "admin",
+                "changeReason": "비활성화 테스트"
             }
         """;
 
         //then
         mockMvc.perform(patch("/api/admin/risk-rules/{ruleCode}", RiskRuleCodes.HIGH_RISK_WALLET)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
+                        .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.enabled").value(false))
                 .andExpect(jsonPath("$.score").value(80))
@@ -131,15 +131,15 @@ class AdminRiskRuleConfigControllerTest extends IntegrationTestSupport {
                 "고위험 지갑 차단"
         ));
 
-        String body = """
+        String requestBody = """
             {
-              "score": -1
+                "score": -1
             }
         """;
 
         mockMvc.perform(patch("/api/admin/risk-rules/{ruleCode}", RiskRuleCodes.HIGH_RISK_WALLET)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 }

@@ -12,6 +12,8 @@ import java.util.List;
 public interface WithdrawalRequestRepository extends JpaRepository<WithdrawalRequest, Long> {
     boolean existsByUserIdAndChainTypeAndToAddressAndIdNot(Long userId, String chainType, String toAddress, Long id);
 
+    boolean existsByUserIdAndChainTypeAndToAddress(Long userId, String chainType, String toAddress);
+
     long countByUserIdAndRequestedAt(Long userId, LocalDateTime requestedAt);
 
     @Query("""

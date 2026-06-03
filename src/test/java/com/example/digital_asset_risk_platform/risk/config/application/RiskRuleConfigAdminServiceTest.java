@@ -147,7 +147,7 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
         assertThat(response.score()).isEqualTo(80);
         assertThat(response.description()).isEqualTo("오탐 감소를 위해 점수를 조정");
 
-        List<RiskRuleConfigHistory> histories = riskRuleConfigHistoryRepository.findByRuleCodeOrderByChangedByDesc(RiskRuleCodes.HIGH_RISK_WALLET);
+        List<RiskRuleConfigHistory> histories = riskRuleConfigHistoryRepository.findByRuleCodeOrderByChangedAtDesc(RiskRuleCodes.HIGH_RISK_WALLET);
         assertThat(histories).hasSize(1);
 
         RiskRuleConfigHistory history = histories.get(0);
@@ -189,5 +189,54 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
 
         List<RiskRuleConfigHistory> histories = riskRuleConfigHistoryRepository.findAll();
         assertThat(histories).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Rule 변경 이력은 최신 변경 시각순으로 조회한다")
+    void case6() throws InterruptedException {
+        //given
+        riskRuleConfigRepository.save(new RiskRuleConfig(
+                RiskRuleCodes.HIGH_RISK_WALLET,
+                "고위험 지갑 주소 출금",
+                true,
+                100,
+                true,
+                null,
+                "고위험 지갑 주소로 출금하는 경우 차단"
+        ));
+
+        RiskRuleConfigUpdateRequest oldRequest = new RiskRuleConfigUpdateRequest(
+                true,
+                90,
+                true,
+                null,
+                "첫 번째 변경",
+                "z-admin",
+                "오래된 변경"
+        );
+        riskRuleConfigAdminService.updateRuleConfig(RiskRuleCodes.HIGH_RISK_WALLET, oldRequest);
+
+        Thread.sleep(5);
+
+        RiskRuleConfigUpdateRequest latestRequest = new RiskRuleConfigUpdateRequest(
+                true,
+                80,
+                true,
+                null,
+                "두 번째 변경",
+                "a-admin",
+                "최신 변경"
+        );
+        riskRuleConfigAdminService.updateRuleConfig(RiskRuleCodes.HIGH_RISK_WALLET, latestRequest);
+
+        //when
+        List<RiskRuleConfigHistory> histories = riskRuleConfigHistoryRepository.findByRuleCodeOrderByChangedAtDesc(RiskRuleCodes.HIGH_RISK_WALLET);
+
+        //then
+        assertThat(histories).hasSize(2);
+        assertThat(histories.get(0).getChangedBy()).isEqualTo("a-admin");
+        assertThat(histories.get(0).getChangeReason()).isEqualTo("최신 변경");
+        assertThat(histories.get(1).getChangedBy()).isEqualTo("z-admin");
+        assertThat(histories.get(1).getChangeReason()).isEqualTo("오래된 변경");
     }
 }

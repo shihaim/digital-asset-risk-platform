@@ -81,7 +81,7 @@ public class RiskRuleConfigAdminService {
 
     @Transactional(readOnly = true)
     public List<RiskRuleConfigHistoryResponse> getRuleConfigHistories(String ruleCode) {
-        return riskRuleConfigHistoryRepository.findByRuleCodeOrderByChangedByDesc(ruleCode)
+        return riskRuleConfigHistoryRepository.findByRuleCodeOrderByChangedAtDesc(ruleCode)
                 .stream()
                 .map(RiskRuleConfigHistoryResponse::from)
                 .toList();

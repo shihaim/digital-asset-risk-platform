@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface RiskRuleConfigHistoryRepository extends JpaRepository<RiskRuleConfigHistory, Long> {
 
-    List<RiskRuleConfigHistory> findByRuleCodeOrderByChangedByDesc(String ruleCode);
+    List<RiskRuleConfigHistory> findByRuleCodeOrderByChangedAtDesc(String ruleCode);
 }

@@ -40,6 +40,9 @@
 - 심사 시작, 승인, 거절, 오탐, 정탐 처리
 - 사용자 리스크 타임라인 조회
 - 관리자 알림 조회 및 읽음 처리
+- Rule 설정 조회/수정
+- Rule 변경 감사 이력 조회
+- Rule 시뮬레이션
 - Rule 적중 통계 조회
 
 ### Kafka / Outbox
@@ -56,7 +59,7 @@
 - Redis 기반 지갑 위험도 캐시
 - KYT Provider Mock 기반 외부 지갑 위험도 조회 구조
 - DB 기반 FDS Rule 설정
-- 관리자 Rule 설정 조회/수정 API
+- 관리자 Rule 설정 조회/수정 및 변경 이력 관리
 - Kafka / Redis Testcontainers 기반 E2E 테스트
 
 ---
@@ -152,7 +155,61 @@ sequenceDiagram
 
 ---
 
-## 6. 실행 방법
+## 6. 관리자 API 목록
+
+| Area | API | Purpose |
+| --- | --- | --- |
+| RiskCase | `GET /api/admin/risk-cases` | 위험 케이스 목록 조회 |
+| RiskCase | `GET /api/admin/risk-cases/{caseId}` | 위험 케이스 상세 조회 |
+| RiskCase | `POST /api/admin/risk-cases/{caseId}/start-review` | 심사 시작 |
+| RiskCase | `POST /api/admin/risk-cases/{caseId}/approve` | 심사 승인 |
+| RiskCase | `POST /api/admin/risk-cases/{caseId}/reject` | 심사 거절 |
+| RiskCase | `POST /api/admin/risk-cases/{caseId}/mark-false-positive` | 오탐 처리 |
+| RiskCase | `POST /api/admin/risk-cases/{caseId}/mark-true-positive` | 정탐 처리 |
+| Rule Config | `GET /api/admin/risk-rules` | Rule 설정 목록 조회 |
+| Rule Config | `GET /api/admin/risk-rules/{ruleCode}` | Rule 설정 상세 조회 |
+| Rule Config | `PATCH /api/admin/risk-rules/{ruleCode}` | Rule 설정 수정 및 변경 이력 저장 |
+| Rule Config | `GET /api/admin/risk-rules/{ruleCode}/histories` | Rule 설정 변경 이력 최신순 조회 |
+| Rule Simulation | `POST /api/admin/risk-rules/simulate` | 운영 데이터 저장 없는 Rule 평가 시뮬레이션 |
+| Rule Statistics | `GET /api/admin/risk-rule-statistics` | Rule 적중 통계 조회 |
+| Rule Statistics | `GET /api/admin/risk-rule-statistics/top` | 상위 Rule 적중 통계 조회 |
+| Outbox | `GET /api/admin/outbox-events/summary` | Outbox 상태 요약 조회 |
+| Outbox | `GET /api/admin/outbox-events?status=FAILED` | Outbox 이벤트 목록 조회 |
+| Outbox | `POST /api/admin/outbox-events/{eventId}/retry` | 실패 이벤트 수동 재처리 |
+| Notification | `GET /api/admin/notifications` | 관리자 알림 조회 |
+| Notification | `GET /api/admin/notifications/unread-count` | 읽지 않은 알림 수 조회 |
+| Notification | `POST /api/admin/notifications/{notificationId}/read` | 알림 읽음 처리 |
+| Dashboard | `GET /api/admin/risk-dashboard/summary` | 관리자 대시보드 요약 조회 |
+| Timeline | `GET /api/admin/users/{userId}/risk-timeline` | 사용자 리스크 타임라인 조회 |
+
+---
+
+## 7. 2차 고도화
+
+### Rule 변경 감사 이력
+
+Rule 설정을 수정할 때 변경 전/후 값을 `RiskRuleConfigHistory`에 저장합니다. 이력에는 `changedBy`, `changeReason`, `changedAt`을 함께 남기며, Rule 수정과 이력 저장은 하나의 트랜잭션에서 처리합니다.
+
+```text
+PATCH /api/admin/risk-rules/{ruleCode}
+  -> 기존 RiskRuleConfig 조회
+  -> 변경 전 Snapshot 생성
+  -> Rule 설정 변경
+  -> 변경 후 Snapshot 생성
+  -> RiskRuleConfigHistory 저장
+```
+
+운영자는 `GET /api/admin/risk-rules/{ruleCode}/histories`로 특정 Rule의 변경 이력을 최신 변경 시각순으로 확인할 수 있습니다.
+
+### Rule 시뮬레이션 API
+
+`POST /api/admin/risk-rules/simulate`는 운영 Rule 설정과 기존 `DecisionEngine`을 재사용해 입력한 출금 조건의 평가 결과만 반환합니다.
+
+시뮬레이션은 실제 출금 요청이 아니므로 `WithdrawalRequest`, `RiskEvaluation`, `RiskRuleHit`, `RiskCase`를 저장하지 않습니다. Rule 점수, blocking 여부, 임계값 조정 전후의 영향을 운영 데이터 오염 없이 확인하기 위한 관리자용 API입니다.
+
+---
+
+## 8. 실행 방법
 
 ```bash
 cp .env.example .env
@@ -182,7 +239,7 @@ http://localhost:8085
 
 ---
 
-## 7. 테스트 실행
+## 9. 테스트 실행
 
 전체 테스트:
 
@@ -202,9 +259,29 @@ Redis 캐시 테스트:
 ./gradlew test --tests "*FdsWalletRiskCacheIntegrationTest"
 ```
 
+Rule 변경 이력 Service 테스트:
+
+```bash
+./gradlew test --tests "*RiskRuleConfigAdminServiceTest"
+```
+
+Rule 시뮬레이션 Controller/Service 테스트:
+
+```bash
+./gradlew test --tests "*AdminRiskRuleSimulationControllerTest" --tests "*RiskRuleSimulationServiceTest"
+```
+
+Windows PowerShell:
+
+```powershell
+.\gradlew test
+```
+
+테스트는 Testcontainers 기반으로 Kafka, Redis, DB를 사용하므로 Docker Desktop 실행 환경이 필요합니다.
+
 ---
 
-## 8. 문서
+## 10. 문서
 
 - [설계 문서](docs/architecture.md)
 - [운영 문서](docs/operations.md)
@@ -219,10 +296,9 @@ Redis 캐시 테스트:
 
 ---
 
-## 9. 향후 개선 방향
+## 11. 향후 개선 방향
 
 - 실제 KYT Provider 연동
-- Rule 설정 변경 이력 관리
 - 관리자 권한/RBAC 적용
 - Outbox DLQ 모니터링 고도화
 - Prometheus/Grafana 기반 운영 지표 수집

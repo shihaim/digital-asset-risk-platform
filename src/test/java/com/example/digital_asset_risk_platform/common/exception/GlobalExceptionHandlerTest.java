@@ -37,11 +37,11 @@ class GlobalExceptionHandlerTest extends IntegrationTestSupport {
     void case2() throws Exception {
         String requestBody = """
             {
-              "userId": null,
-              "assetSymbol": "",
-              "chainType": "TRON",
-              "toAddress": "",
-              "amount": "-1"
+                "userId": null,
+                "assetSymbol": "",
+                "chainType": "TRON",
+                "toAddress": "",
+                "amount": "-1"
             }
         """;
 

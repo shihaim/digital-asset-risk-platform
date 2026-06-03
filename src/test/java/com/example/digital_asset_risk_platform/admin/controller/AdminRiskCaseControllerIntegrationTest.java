@@ -118,11 +118,11 @@ public class AdminRiskCaseControllerIntegrationTest extends IntegrationTestSuppo
         WithdrawalCreateResponse response = createHeldWithdrawal(30001L);
 
         String requestBody = """
-                    {
-                        "reviewer": "admin01",
-                        "comment": "본인 확인 완료"
-                    }
-                """;
+            {
+                "reviewer": "admin01",
+                "comment": "본인 확인 완료"
+            }
+        """;
 
         //when&then
         mockMvc.perform(post("/api/admin/risk-cases/{caseId}/approve", response.caseId())
@@ -138,11 +138,11 @@ public class AdminRiskCaseControllerIntegrationTest extends IntegrationTestSuppo
         WithdrawalCreateResponse response = createHeldWithdrawal(40001L);
 
         String requestBody = """
-                    {
-                        "reviewer": "admin01",
-                        "comment": "피싱 피해 의심"
-                    }
-                """;
+            {
+                "reviewer": "admin01",
+                "comment": "피싱 피해 의심"
+            }
+        """;
 
         //when&then
         mockMvc.perform(post("/api/admin/risk-cases/{caseId}/reject", response.caseId())

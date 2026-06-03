@@ -30,7 +30,7 @@ GET /api/admin/outbox-events/summary
 GET /api/admin/outbox-events?status=DEAD&page=0&size=20
 ```
 
-`status`는 선택 파라미터입니다.
+`status`는 필수 파라미터입니다.
 
 ### Response
 

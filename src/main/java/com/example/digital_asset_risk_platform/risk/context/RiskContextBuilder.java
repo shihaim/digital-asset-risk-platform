@@ -45,7 +45,7 @@ public class RiskContextBuilder {
                 .map(AccountSecurityEvent::getEventAt)
                 .orElse(null);
 
-        boolean usedAddressBefore = withdrawalRequestRepository.existsByUserIdAndChainTypeAndToAddressAndIdNot(userId, withdrawal.getChainType(), withdrawal.getToAddress(), withdrawal.getId());
+        boolean usedAddressBefore = isUsedAddressBefore(withdrawal);
 
         BigDecimal averageAmount = withdrawalRequestRepository.averageAmountByUserId(userId);
 
@@ -62,6 +62,23 @@ public class RiskContextBuilder {
                 !usedAddressBefore,
                 averageAmount,
                 withdrawalCountLast24h
+        );
+    }
+
+    private boolean isUsedAddressBefore(WithdrawalRequest withdrawal) {
+        if (withdrawal.getId() == null) {
+            return withdrawalRequestRepository.existsByUserIdAndChainTypeAndToAddress(
+                    withdrawal.getUserId(),
+                    withdrawal.getChainType(),
+                    withdrawal.getToAddress()
+            );
+        }
+
+        return withdrawalRequestRepository.existsByUserIdAndChainTypeAndToAddressAndIdNot(
+                withdrawal.getUserId(),
+                withdrawal.getChainType(),
+                withdrawal.getToAddress(),
+                withdrawal.getId()
         );
     }
 }

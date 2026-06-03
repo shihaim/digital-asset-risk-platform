@@ -34,11 +34,11 @@ public class WithdrawalControllerIntegrationTest extends IntegrationTestSupport 
     void case1() throws Exception {
         String requestBody = """
             {
-              "userId": 10001,
-              "assetSymbol": "USDT",
-              "chainType": "TRON",
-              "toAddress": "TNORMAL000001",
-              "amount": "100.000000000000000000"
+                "userId": 10001,
+                "assetSymbol": "USDT",
+                "chainType": "TRON",
+                "toAddress": "TNORMAL000001",
+                "amount": "100.000000000000000000"
             }
         """;
 

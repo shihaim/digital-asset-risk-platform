@@ -17,6 +17,8 @@
 - Consumer 멱등성 검증
 - sync / async 평가 모드 차이 검증
 - Redis cache 및 KYT Provider Mock fallback 검증
+- Rule 설정 변경 이력 저장 및 최신순 조회 검증
+- Rule 시뮬레이션 결과 반환 및 운영 데이터 미저장 검증
 
 ---
 
@@ -26,6 +28,8 @@
 | --- | --- |
 | Unit Test | Rule, DecisionEngine, Domain Entity, Consumer 단위 로직 |
 | Integration Test | WithdrawalService, RiskCaseService, OutboxEventPublisher, WalletRiskService |
+| Admin Service Test | Rule 설정 변경 이력, Rule 시뮬레이션 Service 동작 |
+| Controller Test | 관리자 API 요청/응답 검증 |
 | Kafka E2E Test | Testcontainers Kafka 기반 Producer/Consumer 흐름 |
 | Redis Integration Test | Testcontainers Redis 기반 캐시 동작 |
 | Business E2E Test | 출금 요청부터 관리자 심사까지 전체 흐름 |
@@ -44,6 +48,17 @@
 - 24시간 내 반복 출금 Rule
 - 고위험 지갑 주소 Rule
 - DB Rule 설정 반영 여부
+- Rule 설정 수정 시 변경 전/후 이력 저장
+- Rule 변경 이력 최신 변경 시각순 조회
+
+### Rule Simulation
+
+- 시뮬레이션 요청 성공 시 `totalScore`, `riskLevel`, `decision`, `ruleHits` 반환
+- 기존 Rule 목록과 `DecisionEngine` 재사용
+- 고액 출금 조건에서 `HIGH_AMOUNT_WITHDRAWAL` RuleHit 발생
+- 고위험 지갑 주소에서 `HIGH_RISK_WALLET` RuleHit 발생
+- 시뮬레이션 후 `WithdrawalRequest` 미저장
+- 운영 데이터인 `RiskEvaluation`, `RiskRuleHit`, `RiskCase`를 저장하지 않는 흐름 검증
 
 ### DecisionEngine
 
@@ -127,6 +142,18 @@ Redis/KYT 캐시 통합 테스트:
 
 ```bash
 ./gradlew test --tests "*FdsWalletRiskCacheIntegrationTest"
+```
+
+Rule 변경 이력 Service 테스트:
+
+```bash
+./gradlew test --tests "*RiskRuleConfigAdminServiceTest"
+```
+
+Rule 시뮬레이션 Controller/Service 테스트:
+
+```bash
+./gradlew test --tests "*AdminRiskRuleSimulationControllerTest" --tests "*RiskRuleSimulationServiceTest"
 ```
 
 테스트는 Testcontainers 기반으로 Kafka, Redis, DB를 띄우므로 Docker Desktop 실행 환경이 필요합니다.

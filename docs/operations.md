@@ -12,7 +12,8 @@
 | RiskCase | 심사 대기/심사 중 케이스 |
 | Notification | 읽지 않은 관리자 알림 |
 | Rule Statistics | 자주 적중하는 Rule |
-| Rule Config | Rule 활성화 여부, 점수, blocking 여부, 임계값 |
+| Rule Config | Rule 활성화 여부, 점수, blocking 여부, 임계값, 변경 이력 |
+| Rule Simulation | Rule 변경 전후 예상 평가 결과 |
 | Timeline | 특정 사용자의 로그인, 보안 이벤트, 출금 이력 |
 
 ---
@@ -81,7 +82,9 @@ Rule 설정은 DB에서 관리합니다.
 | --- | --- |
 | `GET /api/admin/risk-rules` | Rule 설정 목록 조회 |
 | `GET /api/admin/risk-rules/{ruleCode}` | Rule 설정 상세 조회 |
-| `PATCH /api/admin/risk-rules/{ruleCode}` | Rule 설정 수정 |
+| `PATCH /api/admin/risk-rules/{ruleCode}` | Rule 설정 수정 및 변경 이력 저장 |
+| `GET /api/admin/risk-rules/{ruleCode}/histories` | Rule 설정 변경 이력 최신순 조회 |
+| `POST /api/admin/risk-rules/simulate` | 운영 데이터 저장 없는 Rule 평가 시뮬레이션 |
 
 운영 시 주의점:
 
@@ -89,6 +92,9 @@ Rule 설정은 DB에서 관리합니다.
 - `score` 변경은 총점 기반 `RiskLevel` 판단에 영향을 줍니다.
 - `blocking=true` Rule은 적중 시 즉시 `CRITICAL`로 판단될 수 있습니다.
 - `thresholdValue`는 Rule별 임계값이므로 변경 전 테스트 시나리오로 검증해야 합니다.
+- Rule 설정 변경 요청에는 `changedBy`, `changeReason`을 함께 남겨야 합니다.
+- 변경 이력은 변경 전/후 값과 변경자, 변경 사유, 변경 시각을 포함합니다.
+- 시뮬레이션 API는 `WithdrawalRequest`, `RiskEvaluation`, `RiskRuleHit`, `RiskCase`를 저장하지 않고 평가 결과만 반환합니다.
 
 ---
 
