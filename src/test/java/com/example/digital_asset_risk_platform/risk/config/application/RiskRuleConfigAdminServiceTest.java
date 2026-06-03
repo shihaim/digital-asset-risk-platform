@@ -9,7 +9,9 @@ import com.example.digital_asset_risk_platform.risk.config.dto.RiskRuleConfigUpd
 import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigHistoryRepository;
 import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.rule.RiskRuleCodes;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,11 @@ class RiskRuleConfigAdminServiceTest extends IntegrationTestSupport {
     void setUp() {
         riskRuleConfigRepository.deleteAll();
         riskRuleConfigHistoryRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        RiskRuleConfigFixture.resetDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test

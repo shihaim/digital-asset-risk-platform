@@ -1,11 +1,19 @@
 package com.example.digital_asset_risk_platform.risk.simulation.application;
 
+import com.example.digital_asset_risk_platform.account.repository.AccountLoginEventRepository;
+import com.example.digital_asset_risk_platform.account.repository.AccountSecurityEventRepository;
+import com.example.digital_asset_risk_platform.risk.config.repository.RiskRuleConfigRepository;
 import com.example.digital_asset_risk_platform.risk.domain.RiskDecisionType;
+import com.example.digital_asset_risk_platform.risk.repository.RiskCaseRepository;
+import com.example.digital_asset_risk_platform.risk.repository.RiskEvaluationRepository;
+import com.example.digital_asset_risk_platform.risk.repository.RiskRuleHitRepository;
 import com.example.digital_asset_risk_platform.risk.rule.RiskRuleCodes;
 import com.example.digital_asset_risk_platform.risk.simulation.dto.RiskRuleSimulationRequest;
 import com.example.digital_asset_risk_platform.risk.simulation.dto.RiskRuleSimulationResponse;
+import com.example.digital_asset_risk_platform.risk.support.RiskRuleConfigFixture;
 import com.example.digital_asset_risk_platform.support.IntegrationTestSupport;
 import com.example.digital_asset_risk_platform.wallet.domain.WithdrawalRequest;
+import com.example.digital_asset_risk_platform.wallet.repository.WalletAddressRiskRepository;
 import com.example.digital_asset_risk_platform.wallet.repository.WithdrawalRequestRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,9 +32,38 @@ class RiskRuleSimulationServiceTest extends IntegrationTestSupport {
     @Autowired
     WithdrawalRequestRepository withdrawalRequestRepository;
 
+    @Autowired
+    RiskRuleConfigRepository riskRuleConfigRepository;
+
+    @Autowired
+    RiskCaseRepository riskCaseRepository;
+
+    @Autowired
+    RiskRuleHitRepository riskRuleHitRepository;
+
+    @Autowired
+    RiskEvaluationRepository riskEvaluationRepository;
+
+    @Autowired
+    WalletAddressRiskRepository walletAddressRiskRepository;
+
+    @Autowired
+    AccountLoginEventRepository accountLoginEventRepository;
+
+    @Autowired
+    AccountSecurityEventRepository accountSecurityEventRepository;
+
     @BeforeEach
     void setUp() {
+        riskCaseRepository.deleteAll();
+        riskRuleHitRepository.deleteAll();
+        riskEvaluationRepository.deleteAll();
         withdrawalRequestRepository.deleteAll();
+        walletAddressRiskRepository.deleteAll();
+        accountLoginEventRepository.deleteAll();
+        accountSecurityEventRepository.deleteAll();
+
+        RiskRuleConfigFixture.resetDefaultConfigs(riskRuleConfigRepository);
     }
 
     @Test
