@@ -34,7 +34,17 @@ public class AdminNotificationConsumerIntegrationTest extends IntegrationTestSup
         //given
         Acknowledgment acknowledgment = mock(Acknowledgment.class);
 
-        RiskCaseCreatedEvent event = new RiskCaseCreatedEvent("event-case-001", 100L, 10L, 10001L, "AML_REVIEW", "REVIEW_REQUIRED", "CRITICAL", LocalDateTime.now(), LocalDateTime.now());
+        RiskCaseCreatedEvent event = new RiskCaseCreatedEvent(
+                "event-case-001",
+                100L,
+                10L,
+                10001L,
+                "AML_REVIEW",
+                "REVIEW_REQUIRED",
+                "CRITICAL",
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
         //when
         adminNotificationConsumer.consume(event, acknowledgment);
@@ -50,7 +60,17 @@ public class AdminNotificationConsumerIntegrationTest extends IntegrationTestSup
         //given
         Acknowledgment acknowledgment = mock(Acknowledgment.class);
 
-        RiskCaseCreatedEvent event = new RiskCaseCreatedEvent("event-case-duplicate", 100L, 10L, 10001L, "AML_REVIEW", "REVIEW_REQUIRED", "CRITICAL", LocalDateTime.now(), LocalDateTime.now());
+        RiskCaseCreatedEvent event = new RiskCaseCreatedEvent(
+                "event-case-duplicate",
+                100L,
+                10L,
+                10001L,
+                "AML_REVIEW",
+                "REVIEW_REQUIRED",
+                "CRITICAL",
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
         //when
         adminNotificationConsumer.consume(event, acknowledgment);

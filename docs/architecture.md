@@ -10,6 +10,7 @@
 - Rule 적중 근거를 `RiskEvaluation`과 `RiskRuleHit`으로 남긴다.
 - 출금 상태를 FDS 평가 결과에 따라 일관되게 변경한다.
 - 위험 출금은 `RiskCase`로 전환해 관리자 심사 흐름으로 연결한다.
+- 단건 평가 결과를 사용자 단위 누적 위험 프로필로 확장한다.
 - Kafka 이벤트 발행 실패와 Consumer 중복 처리에도 데이터 정합성을 유지한다.
 - Rule 설정, 변경 이력, 운영 조회 기능을 통해 운영 가능한 FDS 구조로 확장한다.
 - 운영 데이터 저장 없이 Rule 변경 영향을 확인할 수 있는 시뮬레이션 API를 제공한다.
@@ -34,11 +35,13 @@ flowchart LR
     Kafka --> Audit[AuditEventConsumer]
     Kafka --> Notify[AdminNotificationConsumer]
     Kafka --> Stats[RiskRuleStatisticsConsumer]
+    Kafka --> Profile[UserRiskProfileConsumers]
 
     FDS --> DB
     Audit --> DB
     Notify --> DB
     Stats --> DB
+    Profile --> DB
 ```
 
 ---
@@ -203,8 +206,8 @@ flowchart TD
 | Topic | Event | Consumer |
 | --- | --- | --- |
 | `withdrawal.requested` | `WithdrawalRequestedEvent` | `FdsWithdrawalConsumer`, `AuditEventConsumer` |
-| `risk.evaluation.completed` | `RiskEvaluationCompletedEvent` | `AuditEventConsumer`, `RiskRuleStatisticsConsumer` |
-| `risk.case.created` | `RiskCaseCreatedEvent` | `AuditEventConsumer`, `AdminNotificationConsumer` |
+| `risk.evaluation.completed` | `RiskEvaluationCompletedEvent` | `AuditEventConsumer`, `RiskRuleStatisticsConsumer`, `UserRiskProfileEvaluationConsumer` |
+| `risk.case.created` | `RiskCaseCreatedEvent` | `AuditEventConsumer`, `AdminNotificationConsumer`, `UserRiskProfileCaseConsumer` |
 
 ### Outbox 상태
 
@@ -243,6 +246,8 @@ Kafka message
 ```
 
 이 구조는 감사 로그, 관리자 알림, Rule 통계처럼 중복 처리 시 데이터가 누적될 수 있는 Consumer에서 특히 중요합니다.
+
+사용자 위험 프로필도 누적 점수와 누적 카운트를 다루므로 같은 멱등성 구조를 사용합니다. `RiskEvaluationCompletedEvent`는 사용자 점수와 차단 출금 수를 갱신하고, `RiskCaseCreatedEvent`는 실제 생성된 Case 수를 갱신합니다. 상세 설계는 [User Risk Profile](user-risk-profile.md)을 참고합니다.
 
 ---
 

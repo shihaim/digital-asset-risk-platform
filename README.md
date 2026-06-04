@@ -39,6 +39,7 @@
 - `RiskCase` 목록/상세 조회
 - 심사 시작, 승인, 거절, 오탐, 정탐 처리
 - 사용자 리스크 타임라인 조회
+- 사용자 누적 위험 프로필 조회
 - 관리자 알림 조회 및 읽음 처리
 - Rule 설정 조회/수정
 - Rule 변경 감사 이력 조회
@@ -99,11 +100,13 @@ flowchart LR
     Kafka --> Audit[AuditEventConsumer]
     Kafka --> Notify[AdminNotificationConsumer]
     Kafka --> Stats[RiskRuleStatisticsConsumer]
+    Kafka --> Profile[UserRiskProfileConsumers]
 
     FDS --> DB
     Audit --> DB
     Notify --> DB
     Stats --> DB
+    Profile --> DB
 ```
 
 초기에는 동기 FDS 평가로 비즈니스 정합성을 먼저 확보하고, 이후 Kafka 이벤트 발행, Consumer 후속 처리, Outbox Pattern, 비동기 FDS 평가 구조로 확장했습니다.
@@ -181,10 +184,11 @@ sequenceDiagram
 | Notification | `POST /api/admin/notifications/{notificationId}/read` | 알림 읽음 처리 |
 | Dashboard | `GET /api/admin/risk-dashboard/summary` | 관리자 대시보드 요약 조회 |
 | Timeline | `GET /api/admin/users/{userId}/risk-timeline` | 사용자 리스크 타임라인 조회 |
+| User Risk Profile | `GET /api/admin/users/{userId}/risk-profile` | 사용자 누적 위험 프로필 조회 |
 
 ---
 
-## 7. 2차 고도화
+## 7. 고도화 기능
 
 ### Rule 변경 감사 이력
 
@@ -206,6 +210,12 @@ PATCH /api/admin/risk-rules/{ruleCode}
 `POST /api/admin/risk-rules/simulate`는 운영 Rule 설정과 기존 `DecisionEngine`을 재사용해 입력한 출금 조건의 평가 결과만 반환합니다.
 
 시뮬레이션은 실제 출금 요청이 아니므로 `WithdrawalRequest`, `RiskEvaluation`, `RiskRuleHit`, `RiskCase`를 저장하지 않습니다. Rule 점수, blocking 여부, 임계값 조정 전후의 영향을 운영 데이터 오염 없이 확인하기 위한 관리자용 API입니다.
+
+### User Risk Profile
+
+`UserRiskProfile`은 단건 출금 평가 결과를 사용자 단위 누적 위험도로 확장합니다. `RiskEvaluationCompletedEvent`는 누적 위험 점수와 차단 출금 횟수를 갱신하고, `RiskCaseCreatedEvent`는 실제 생성된 Case 수를 증가시킵니다.
+
+Kafka 재처리나 중복 수신 상황에서도 누적 점수와 카운트가 중복 반영되지 않도록 `ProcessedEventService` 기반 멱등 처리를 적용합니다.
 
 ---
 
@@ -284,6 +294,7 @@ Windows PowerShell:
 ## 10. 문서
 
 - [설계 문서](docs/architecture.md)
+- [User Risk Profile 설계](docs/user-risk-profile.md)
 - [운영 문서](docs/operations.md)
 - [테스트 전략](docs/test-strategy.md)
 - [로컬 실행 가이드](docs/local-runtime.md)

@@ -24,3 +24,14 @@ management:
   endpoint:
     health:
       show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:when_authorized}
+
+app:
+  kafka:
+    consumer:
+      group:
+        fds-withdrawal: fds-withdrawal-consumer
+        audit-log: audit-log-consumer
+        admin-notification: admin-notification-consumer
+        rule-statistics: rule-statistics-consumer
+        user-risk-profile-evaluation: user-risk-profile-evaluation-consumer
+        user-risk-profile-case: user-risk-profile-case-consumer

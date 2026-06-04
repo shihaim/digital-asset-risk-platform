@@ -26,8 +26,14 @@ class RiskRuleStatisticsConsumerTest {
         LocalDateTime evaluatedAt = LocalDateTime.now();
 
         RiskEvaluationCompletedEvent event = new RiskEvaluationCompletedEvent(
-                "event-evaluation-001", 10L, "WITHDRAWAL", 1L, 10001L,
-                190, "CRITICAL", "BLOCK_WITHDRAWAL",
+                "event-evaluation-001",
+                10L,
+                "WITHDRAWAL",
+                1L,
+                10001L,
+                190,
+                "CRITICAL",
+                "BLOCK_WITHDRAWAL",
                 List.of("NEW_DEVICE_WITHDRAWAL", "OTP_RESET_WITHDRAWAL", "HIGH_RISK_WALLET"),
                 evaluatedAt,
                 LocalDateTime.now()

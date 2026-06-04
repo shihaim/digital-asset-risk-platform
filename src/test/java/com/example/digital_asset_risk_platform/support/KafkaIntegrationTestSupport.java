@@ -17,7 +17,10 @@ import org.testcontainers.utility.DockerImageName;
         "app.kafka.consumer.group.fds-withdrawal=fds-withdrawal-consumer-${random.uuid}",
         "app.kafka.consumer.group.audit-log=audit-log-consumer-${random.uuid}",
         "app.kafka.consumer.group.admin-notification=admin-notification-consumer-${random.uuid}",
-        "app.kafka.consumer.group.rule-statistics=rule-statistics-consumer-${random.uuid}"})
+        "app.kafka.consumer.group.rule-statistics=rule-statistics-consumer-${random.uuid}",
+        "app.kafka.consumer.group.user-risk-profile-evaluation=user-risk-profile-evaluation-consumer-${random.uuid}",
+        "app.kafka.consumer.group.user-risk-profile-case=user-risk-profile-case-consumer-${random.uuid}"
+})
 @Testcontainers
 public abstract class KafkaIntegrationTestSupport extends IntegrationTestSupport {
 

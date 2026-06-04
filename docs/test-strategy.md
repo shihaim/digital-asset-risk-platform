@@ -19,6 +19,7 @@
 - Redis cache 및 KYT Provider Mock fallback 검증
 - Rule 설정 변경 이력 저장 및 최신순 조회 검증
 - Rule 시뮬레이션 결과 반환 및 운영 데이터 미저장 검증
+- 사용자 누적 위험 프로필 갱신 및 멱등성 검증
 
 ---
 
@@ -86,7 +87,19 @@
 - `withdrawal.requested` 기반 FDS Consumer 처리
 - `risk.case.created` 기반 관리자 알림 생성
 - `risk.evaluation.completed` 기반 Rule 통계 증가
+- `risk.evaluation.completed` 기반 사용자 위험 점수 및 차단 횟수 증가
+- `risk.case.created` 기반 사용자 Case count 증가
 - 중복 eventId 처리 방지
+
+### User Risk Profile
+
+- 평가 점수를 프로필 점수로 변환하는 경계값 검증
+- 누적 점수에 따른 `NORMAL`, `WATCH`, `HIGH`, `CRITICAL` 등급 변경 검증
+- `BLOCK_WITHDRAWAL` 평가 이벤트 처리 시 차단 출금 횟수 증가
+- `RiskCaseCreatedEvent` 처리 시 실제 Case count 증가
+- 동일 `eventId` 재수신 시 점수와 카운트 중복 반영 방지
+- 프로필 없는 사용자 조회 시 DB row 생성 없이 기본 응답 반환
+- 관리자 위험 프로필 조회 API 응답 필드 검증
 
 ### Redis / KYT
 
@@ -107,7 +120,7 @@
   -> FDS 평가 / RiskCase 생성
   -> Outbox에 risk.evaluation.completed, risk.case.created 저장
   -> Kafka 발행
-  -> Audit / Notification / RuleStatistics Consumer 처리
+  -> Audit / Notification / RuleStatistics / UserRiskProfile Consumer 처리
 ```
 
 ---

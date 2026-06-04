@@ -1,6 +1,6 @@
 # Admin Operations API
 
-운영자가 Outbox, 관리자 알림, 대시보드 요약, 사용자 리스크 타임라인을 확인하는 API입니다.
+운영자가 Outbox, 관리자 알림, 대시보드 요약, 사용자 리스크 타임라인, 사용자 누적 위험 프로필을 확인하는 API입니다.
 
 ---
 
@@ -196,7 +196,32 @@ GET /api/admin/users/{userId}/risk-timeline
 
 ---
 
-## 8. Outbox Status
+## 8. User Risk Profile
+
+```http
+GET /api/admin/users/{userId}/risk-profile
+```
+
+사용자의 누적 위험 점수, 위험 등급, 실제 생성된 Case 수, 차단 출금 횟수를 조회합니다.
+
+### Response
+
+```json
+{
+  "userId": 10001,
+  "currentRiskScore": 80,
+  "riskLevel": "HIGH",
+  "totalCaseCount": 3,
+  "totalBlockedWithdrawalCount": 1,
+  "lastEvaluatedAt": "2026-06-04T19:30:00"
+}
+```
+
+평가 이력이 없는 사용자는 `NORMAL`, score `0`, count `0`으로 응답합니다. 조회만으로 `user_risk_profile` row를 생성하지 않습니다.
+
+---
+
+## 9. Outbox Status
 
 | Status | Description |
 | --- | --- |

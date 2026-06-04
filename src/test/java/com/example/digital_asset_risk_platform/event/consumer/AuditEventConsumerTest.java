@@ -43,8 +43,18 @@ class AuditEventConsumerTest {
     void case2() {
         //given
         RiskEvaluationCompletedEvent event = new RiskEvaluationCompletedEvent(
-                "event-evaluation-001", 10L, "WITHDRAWAL", 1L, 10001L, 190, "CRITICAL", "BLOCK_WITHDRAWAL",
-                List.of("HIGH_RISK_WALLET"), LocalDateTime.now(), LocalDateTime.now());
+                "event-evaluation-001",
+                10L,
+                "WITHDRAWAL",
+                1L,
+                10001L,
+                190,
+                "CRITICAL",
+                "BLOCK_WITHDRAWAL",
+                List.of("HIGH_RISK_WALLET"),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
         //when
         auditEventConsumer.consumeRiskEvaluationCompleted(event, "1", acknowledgment);
@@ -59,8 +69,15 @@ class AuditEventConsumerTest {
     void case3() {
         //given
         RiskCaseCreatedEvent event = new RiskCaseCreatedEvent(
-                "event-case-001", 100L, 10L, 10001L,
-                "AML_REVIEW", "REVIEW_REQUIRED", "CRITICAL", LocalDateTime.now(), LocalDateTime.now()
+                "event-case-001",
+                100L,
+                10L,
+                10001L,
+                "AML_REVIEW",
+                "REVIEW_REQUIRED",
+                "CRITICAL",
+                LocalDateTime.now(),
+                LocalDateTime.now()
         );
 
         //when

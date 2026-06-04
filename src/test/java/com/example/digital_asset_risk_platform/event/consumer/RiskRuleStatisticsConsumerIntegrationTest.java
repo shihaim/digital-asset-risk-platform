@@ -44,8 +44,18 @@ public class RiskRuleStatisticsConsumerIntegrationTest extends IntegrationTestSu
         LocalDateTime evaluationAt = LocalDateTime.now();
 
         RiskEvaluationCompletedEvent event = new RiskEvaluationCompletedEvent(
-                "event-evaluation-001", 10L, "WITHDRAWAL", 1L, 10001L, 190, "CRITICAL", "BLOCK_WITHDRAWAL",
-                List.of("NEW_DEVICE_WITHDRAWAL", "OPT_RESET_WITHDRAWAL", "HIGH_RISK_WALLET"), evaluationAt, LocalDateTime.now());
+                "event-evaluation-001",
+                10L,
+                "WITHDRAWAL",
+                1L,
+                10001L,
+                190,
+                "CRITICAL",
+                "BLOCK_WITHDRAWAL",
+                List.of("NEW_DEVICE_WITHDRAWAL", "OPT_RESET_WITHDRAWAL", "HIGH_RISK_WALLET"),
+                evaluationAt,
+                LocalDateTime.now()
+        );
 
         //when
         riskRuleStatisticsConsumer.consume(event, acknowledgment);
@@ -66,8 +76,18 @@ public class RiskRuleStatisticsConsumerIntegrationTest extends IntegrationTestSu
         LocalDateTime evaluationAt = LocalDateTime.now();
 
         RiskEvaluationCompletedEvent event = new RiskEvaluationCompletedEvent(
-                "event-evaluation-duplicate", 10L, "WITHDRAWAL", 1L, 10001L, 190, "CRITICAL", "BLOCK_WITHDRAWAL",
-                List.of("HIGH_RISK_WALLET"), evaluationAt, LocalDateTime.now());
+                "event-evaluation-duplicate",
+                10L,
+                "WITHDRAWAL",
+                1L,
+                10001L,
+                190,
+                "CRITICAL",
+                "BLOCK_WITHDRAWAL",
+                List.of("HIGH_RISK_WALLET"),
+                evaluationAt,
+                LocalDateTime.now()
+        );
 
         //when
         riskRuleStatisticsConsumer.consume(event, acknowledgment);

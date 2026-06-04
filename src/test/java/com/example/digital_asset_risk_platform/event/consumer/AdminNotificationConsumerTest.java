@@ -22,8 +22,16 @@ class AdminNotificationConsumerTest {
     void case1() {
         //given
         RiskCaseCreatedEvent event = new RiskCaseCreatedEvent(
-                "event-case-001", 100L, 10L, 10001L,
-                "AML_REVIEW", "REVIEW_REQUIRED", "CRITICAL", LocalDateTime.now(), LocalDateTime.now());
+                "event-case-001",
+                100L,
+                10L,
+                10001L,
+                "AML_REVIEW",
+                "REVIEW_REQUIRED",
+                "CRITICAL",
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
         //when
         adminNotificationConsumer.consume(event, acknowledgment);
